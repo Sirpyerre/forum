@@ -7,6 +7,8 @@ use App\Discussion;
 use Auth;
 use Session;
 use App\Reply;
+use App\User;
+use Notification;
 
 class DiscussionsController extends Controller
 {
@@ -43,14 +45,24 @@ class DiscussionsController extends Controller
     {
     	$discussion	= Discussion::where('slug', $slug)->first();
 
-    	return view('discussions.show')->with('d', $discussion);
+    	$best_answer = $discussion->replies()->where('best_answer', 1)->first();
+
+    	return view('discussions.show')
+            ->with('d', $discussion)
+            ->with('best_answer',$best_answer);
     }
 
     public function reply($id)
     {
     	$d = Discussion::find($id);
     	
-    	// dd(request()->all());
+    	$watchers = array();
+
+    	foreach ($d->watchers as $watcher) {
+    		array_push($watchers, User::find($watcher->user_id));
+    	}
+
+    	Notification::send($watchers, new \App\Notifications\NewReplyAdded($d));
 
     	$reply = Reply::create([
             'user_id' => Auth::id(),
@@ -58,7 +70,7 @@ class DiscussionsController extends Controller
             'content' => request()->reply
         ]);
 
-
+    
     	Session::flash('success', 'Replies to discussion.');
 
     	return redirect()->back();

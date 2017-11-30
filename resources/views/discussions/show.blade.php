@@ -29,6 +29,22 @@
         <p class="text-center">
             {{ $d->content }}    
         </p>
+        <hr>
+        @if($best_answer)
+            <div class="text-center">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <img src="{{ $best_answer->user->avatar }}" alt="" width="50px" height="40px">&nbsp;&nbsp;&nbsp;
+                        <span>
+                            {{ $best_answer->user->name }}</b>
+                        </span>
+                    </div>
+                    <div class="panel-body">
+                        {{ $best_answer->content }}
+                    </div>
+                </div>
+            </div>
+            @endif
     </div>
 
     <div class="panel-footer">
@@ -49,6 +65,11 @@
             <span>
                 {{ $r->user->name }}, <b>{{ $r->created_at->diffForHumans() }}</b>
             </span>
+            @if(!$best_answer)
+                <a href="/" class="btn btn-xs btn-info pull-right">Mark as best answer</a>
+                @else
+                <a href="/" class="btn btn-xs btn-info pull-right">Mark as best answer</a>
+            @endif
         </div>
 
         <div class="panel-body">

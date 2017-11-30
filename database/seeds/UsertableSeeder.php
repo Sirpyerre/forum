@@ -23,7 +23,7 @@ class UsertableSeeder extends Seeder
             'name' => 'Emily Myers',
             'password' => bcrypt('password'),
             'email' => 'emily@myers.com',
-            'avatar' => asset('avatars/avatar.png')
+            'avatar' => asset('avatars/avatar.png')  
         ]); 
     }
 }

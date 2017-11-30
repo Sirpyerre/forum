@@ -22,6 +22,7 @@ class DiscussionsController extends Controller
     	$r = request();
 
     	$this->validate($r, [
+    	    'title' => 'required',
     		'channel_id' => 'required',
     		'content' => 'required',
 
@@ -69,6 +70,9 @@ class DiscussionsController extends Controller
             'discussion_id' => $id,
             'content' => request()->reply
         ]);
+
+    	$reply->user->points += 25;
+    	$reply->user->save();
 
     
     	Session::flash('success', 'Replies to discussion.');

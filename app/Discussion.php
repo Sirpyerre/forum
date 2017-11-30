@@ -11,39 +11,53 @@ class Discussion extends Model
 
     public function channel()
     {
-    	return $this->belongsTo('App\Channel');
+        return $this->belongsTo('App\Channel');
     }
 
     public function user()
     {
-    	return $this->belongsTo('App\User');
+        return $this->belongsTo('App\User');
     }
 
     public function replies()
     {
-    	return $this->hasMany('App\Reply');
+        return $this->hasMany('App\Reply');
     }
 
     public function watchers()
     {
-    	return $this->hasMany('App\Watcher');
+        return $this->hasMany('App\Watcher');
     }
 
     public function is_being_watched_by_auth_user()
     {
-    	$id = Auth::id();
+        $id = Auth::id();
 
-    	$watchers_ids = array();
+        $watchers_ids = array();
 
-    	foreach ($this->watchers as $w) {
+        foreach ($this->watchers as $w) {
 
-    		array_push($watchers_ids, $w->user_id);
-    	}
+            array_push($watchers_ids, $w->user_id);
+        }
 
-    	if (in_array($id, $watchers_ids)) {
-    		return true;
-    	} else {
-    		return false;
-    	}
+        if (in_array($id, $watchers_ids)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function hasBestAnswer()
+    {
+        $result = false;
+
+        foreach ($this->replies as $reply) {
+            if ($reply->best_answer){
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
     }
 }

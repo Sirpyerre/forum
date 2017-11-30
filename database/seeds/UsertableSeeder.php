@@ -16,6 +16,7 @@ class UsertableSeeder extends Seeder
         	'password' => bcrypt('admin'),
         	'email' => 'peter@monoforms.com',
         	'admin' => 1,
+        	'points' => '2000',
         	'avatar' => asset('avatars/avatar.png')
         ]);
 
@@ -23,7 +24,8 @@ class UsertableSeeder extends Seeder
             'name' => 'Emily Myers',
             'password' => bcrypt('password'),
             'email' => 'emily@myers.com',
-            'avatar' => asset('avatars/avatar.png')  
+            'points' => '2000',
+            'avatar' => asset('avatars/avatar.png')
         ]); 
     }
 }

@@ -32,6 +32,11 @@ Route::get('channel/{slug}', [
     'as'   => 'channel'
 ]);
 
+Route::get('discussion/{slug}', [
+    'uses' => 'DiscussionsController@show',
+    'as'   => 'discussions'
+]);
+
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('channels', 'ChannelsController');
 
@@ -43,11 +48,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('discussion/store', [
         'uses' => 'DiscussionsController@store',
         'as'   => 'discussions.store'
-    ]);
-
-    Route::get('discussion/{slug}', [
-        'uses' => 'DiscussionsController@show',
-        'as'   => 'discussions'
     ]);
 
     // Route::post('discussion/reply/{id}', [
@@ -81,9 +81,9 @@ Route::group(['middleware' => 'auth'], function () {
         'as'   => 'discussion.unwatch'
     ]);
 
-    Route::get('discussion/best/reply/{id}',[
-       'uses' => 'RepliesController@best_answer',
-       'as' => 'discussion.best.answer'
+    Route::get('discussion/best/reply/{id}', [
+        'uses' => 'RepliesController@best_answer',
+        'as'   => 'discussion.best.answer'
     ]);
 
 });

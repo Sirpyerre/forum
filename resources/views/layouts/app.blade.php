@@ -12,39 +12,40 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 </head>
 <body>
-    <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
-            <div class="container">
-                <div class="navbar-header">
+<div id="app">
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
 
-                    <!-- Collapsed Hamburger -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse" aria-expanded="false">
-                        <span class="sr-only">Toggle Navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
+                <!-- Collapsed Hamburger -->
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse" aria-expanded="false">
+                    <span class="sr-only">Toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
 
-                    <!-- Branding Image -->
-                    <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
-                    </a>
-                </div>
+                <!-- Branding Image -->
+                <a class="navbar-brand" href="{{ url('/') }}">
+                    {{ config('app.name', 'Laravel') }}
+                </a>
+            </div>
 
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="nav navbar-nav">
-                        &nbsp;
-                    </ul>
+            <div class="collapse navbar-collapse" id="app-navbar-collapse">
+                <!-- Left Side Of Navbar -->
+                <ul class="nav navbar-nav">
+                    &nbsp;
+                </ul>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="nav navbar-nav navbar-right">
-                        <!-- Authentication Links -->
-                        @guest
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
+                <!-- Right Side Of Navbar -->
+                <ul class="nav navbar-nav navbar-right">
+                    <!-- Authentication Links -->
+                    @guest
+                        <li><a href="{{ route('login') }}">Login</a></li>
+                        <li><a href="{{ route('register') }}">Register</a></li>
                         @else
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true">
@@ -54,7 +55,7 @@
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a href="{{ route('logout') }}"
-                                            onclick="event.preventDefault();
+                                           onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                             Logout
                                         </a>
@@ -65,57 +66,84 @@
                                     </li>
                                 </ul>
                             </li>
-                        @endguest
+                            @endguest
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    @if($errors->count())
+        <ul class="list-group-item">
+            @foreach($errors->all() as $error)
+                <li class="list-group-item text-danger">
+                    {{ $error }}
+                </li>
+
+            @endforeach
+        </ul>
+        <hr>
+    @endif
+
+    <div class="container">
+        <div class="col-md-4">
+
+            <a href="{{ route('discussions.create') }}"
+               class="form-control btn btn-primary">
+                Create new discussion
+            </a>
+            <br><br>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a style="text-decoration:none" href="/forum">
+                                Inicio
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/forum?filter=me">My discussions</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/forum?filter=solved">Answered discussions</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/forum?filter=unsolved">Answered discussions</a>
+                        </li>
+
                     </ul>
                 </div>
             </div>
-        </nav>
-
-        <div class="container">
-            <div class="col-md-4">
-            
-                <a href="{{ route('discussions.create') }}" 
-                    class="form-control btn btn-primary">
-                    Create new discussion
-                </a>
-                <br><br>
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <ul class="list-group">
+            <div class="panel panel-default">
+                <div class="panel-heading">Channels</div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        @foreach($channels as $channel)
                             <li class="list-group-item">
                                 <a style="text-decoration:none"
-                                   href="/forum">
-                                        Inicio
-                                   </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="panel panel-default">
-                    <div class="panel-heading">Channels</div>
-                    <div class="panel-body">
-                        <ul class="list-group">
-                            @foreach($channels as $channel)
-                                <li class="list-group-item">
-                                   <a style="text-decoration:none"
                                    href="{{ route('channel', ['slug' => $channel->slug]) }}">
-                                        {{ $channel->title }}
-                                   </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
+                                    {{ $channel->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
-            </div>
-
-            <div class="col-md-8">
-                @yield('content')
             </div>
         </div>
 
+        <div class="col-md-8">
+            @yield('content')
+        </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+</div>
+
+<!-- Scripts -->
+<script src="{{ asset('js/app.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    @if(Session::has('success'))
+        toastr.success('{{ Session::get('success') }}')
+        @endif
+</script>
 </body>
 </html>

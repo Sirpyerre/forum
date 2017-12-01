@@ -7,22 +7,34 @@
             <span>
                 {{ $d->user->name }}, <b>({{ $d->user->points }})</b>
             </span>
+
             @if($d->hasBestAnswer())
                 <span class="btn btn-success pull-right btn-success btn-xs">closed</span>
             @else
                 <span class="btn btn-success pull-right btn-danger btn-xs">open</span>
             @endif
+
+            @if(Auth::id() == $d->user->id)
+                @if(!$d->hasBestAnswer())
+                <a class="btn btn-info pull-right btn-xs" style="margin-right: 8px"
+                   href="{{ route('discussion.edit', ['slug' => $d->slug]) }}">
+                    Edit
+                </a>
+                    @endif
+            @endif
+
             @if($d->is_being_watched_by_auth_user())
-                <a class="btn btn-default pull-right btn-xs"
+                <a class="btn btn-default pull-right btn-xs" style="margin-right: 8px"
                    href="{{ route('discussion.unwatch', ['id' => $d->id]) }}">
                     Dejar de seguir
                 </a>
             @else
-                <a class="btn btn-default pull-right btn-xs"
+                <a class="btn btn-default pull-right btn-xs" style="margin-right: 8px"
                    href="{{ route('discussion.watch', ['id' => $d->id]) }}">
                     Seguir
                 </a>
             @endif
+
         </div>
 
         <div class="panel-body">
@@ -72,7 +84,14 @@
             </span>
                 @if(!$best_answer)
                     @if(Auth::id() == $d->user->id)
-                        <a href="{{ route('discussion.best.answer', ['id' => $r->id]) }}" class="btn btn-xs btn-info pull-right">Mark as best answer</a>
+                        <a href="{{ route('discussion.best.answer', ['id' => $r->id]) }}" style="margin-left:8px"
+                           class="btn btn-xs btn-primary pull-right">Mark as best answer</a>
+                    @endif
+                @endif
+
+                @if(Auth::id() == $r->user->id )
+                    @if(!$r->best_answer)
+                        <a href="{{ route('reply.edit', ['id' => $r->id]) }}" class="btn btn-xs btn-info pull-right">Edit</a>
                     @endif
                 @endif
             </div>

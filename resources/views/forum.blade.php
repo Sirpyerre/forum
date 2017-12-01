@@ -8,7 +8,7 @@
                 <span>
                     {{ $d->user->name }}, <b>{{ $d->created_at->diffForHumans() }}</b>
                 </span>
-                <a class="btn btn-default pull-right btn-xs" href="{{ route('discussions', ['slug'=>$d->slug]) }}">
+                <a class="btn btn-default pull-right btn-xs" style="margin-left: 9px" href="{{ route('discussions', ['slug'=>$d->slug]) }}">
                     View
                 </a>
                 @if($d->hasBestAnswer())

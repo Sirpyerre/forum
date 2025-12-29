@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -23,6 +24,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
+        'admin',
+        'points',
     ];
 
     /**
@@ -47,6 +51,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'admin' => 'boolean',
+            'points' => 'integer',
         ];
     }
 
@@ -60,5 +66,37 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    /**
+     * Get the discussions for the user.
+     */
+    public function discussions(): HasMany
+    {
+        return $this->hasMany(Discussion::class);
+    }
+
+    /**
+     * Get the replies for the user.
+     */
+    public function replies(): HasMany
+    {
+        return $this->hasMany(Reply::class);
+    }
+
+    /**
+     * Get the likes for the user.
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    /**
+     * Get the watchers for the user.
+     */
+    public function watchers(): HasMany
+    {
+        return $this->hasMany(Watcher::class);
     }
 }

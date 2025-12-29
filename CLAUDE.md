@@ -1,307 +1,270 @@
-## Overview
-An advanced forum/discussion application similar to StackOverflow, built with Laravel. This document provides detailed specifications to reproduce this application using modern Laravel versions.
+# CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🛠 Tech Stack
-- **Backend:** Laravel 12.x (PHP 8.4+)
-- **Database:** MySQL (Relational Schema)
-- **Frontend:** Blade Templates + SCSS + Vanilla JS/Alpine.js
-- **Deployment:** Render.com (Live Demo)
+## Project Overview
 
-## Core Features
+A Laravel 12 forum/discussion application using Livewire 3 with Volt for reactive components, Laravel Fortify for authentication, and Pest for testing. The application follows modern Laravel conventions with a focus on simplicity and maintainability.
 
-1. User Authentication & Authorization
-- Traditional registration and login
-- Social authentication (Google, GitHub, Facebook)
-- User profiles with avatars
-- Admin role system
-- Points/reputation system
+## Tech Stack
 
-2. Discussion Management
-- Create discussions with title and content
-- Edit own discussions
-- Delete own discussions
-- Slug-based URLs for SEO
-- Channel/category organization
-- Markdown support in content
+- **Backend:** Laravel 12.x (PHP 8.2+)
+- **Frontend:** Livewire 3 + Volt (functional components), Flux UI components, Tailwind CSS 4
+- **Authentication:** Laravel Fortify (supports 2FA)
+- **Database:** MySQL (configurable via .env)
+- **Testing:** Pest PHP with Laravel plugin
+- **Build Tool:** Vite 7
+- **Code Style:** Laravel Pint
 
-3. Reply System
-- Post replies to discussions
-- Edit own replies
-- Delete own replies
-- Markdown editor for formatting
-- Best answer marking (by discussion author)
-- Nested reply threading (optional enhancement)
+## Development Commands
 
-4. Social Interactions
-- Like/unlike replies
-- Watch/unwatch discussions (notifications)
-- User reputation points
-- Activity tracking
+### Initial Setup
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install
+npm run build
+```
 
-5. Channel Management
-- CRUD operations for channels
-- Browse discussions by channel
-- Channel descriptions and icons
+Or use the composer script:
+```bash
+composer setup
+```
 
-## Database Schema
+### Development Server
+Start all development services (server, queue, logs, vite):
+```bash
+composer dev
+```
 
-### Users Table
-- id (primary key)
-- name (string)
-- email (string, unique)
-- password (string, nullable for OAuth users)
-- avatar (string, nullable)
-- admin (boolean, default false)
-- points (integer, default 50)
-- email_verified_at (timestamp, nullable)
-- remember_token (string, nullable)
-- timestamps
+This runs concurrently:
+- PHP development server on port 8000
+- Queue worker
+- Log viewer (Laravel Pail)
+- Vite dev server
 
-### Channels Table
-- id (primary key)
-- title (string)
-- slug (string, unique)
-- description (text, nullable)
-- timestamps
+Alternatively, run services individually:
+```bash
+php artisan serve        # Development server
+npm run dev             # Vite dev server
+php artisan queue:work  # Queue worker
+php artisan pail        # Log viewer
+```
 
-### Discussions Table
-- id (primary key)
-- user_id (foreign key -> users)
-- channel_id (foreign key -> channels)
-- title (string)
-- slug (string, unique)
-- content (text)
-- views (integer, default 0)
-- timestamps
+### Testing
+```bash
+composer test           # Run all tests
+php artisan test        # Alternative syntax
+php artisan test --filter=TestName  # Run specific test
+```
 
-### Replies Table
-- id (primary key)
-- user_id (foreign key -> users)
-- discussion_id (foreign key -> discussions)
-- content (text)
-- best_answer (boolean, default false)
-- timestamps
+Pest uses SQLite in-memory database for tests (configured in phpunit.xml).
 
-### Likes Table
-- id (primary key)
-- user_id (foreign key -> users)
-- reply_id (foreign key -> replies)
-- timestamps
+### Code Quality
+```bash
+./vendor/bin/pint       # Fix code style issues
+./vendor/bin/pint --test  # Check without fixing
+```
+
+### Database
+```bash
+php artisan migrate           # Run migrations
+php artisan migrate:fresh     # Drop all tables and re-run
+php artisan migrate:fresh --seed  # Include seeders
+php artisan db:seed          # Run seeders only
+```
+
+### Build for Production
+```bash
+npm run build
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+## Architecture
+
+### Component Structure
+
+**Livewire with Volt:** This project uses Volt for functional Livewire components. Volt components are single-file components located in `resources/views/livewire/` with inline PHP logic using the `@volt` directive.
+
+Example Volt component pattern:
+```php
+<?php
+
+use function Livewire\Volt\{state};
+
+state(['count' => 0]);
+
+$increment = fn () => $this->count++;
+
+?>
+
+<div>
+    <h1>{{ $count }}</h1>
+    <button wire:click="increment">+</button>
+</div>
+```
+
+**Class-based Livewire components** are located in `app/Livewire/` when needed for more complex logic.
+
+### Routes
+
+- `routes/web.php` - Main application routes
+- `routes/console.php` - Artisan console commands
+
+Volt routes are registered using `Volt::route()` syntax. Route model binding uses custom keys (e.g., `{channel:slug}`) for SEO-friendly URLs.
+
+### Authentication
+
+Uses Laravel Fortify with the following features:
+- Registration and login
+- Password reset
+- Email verification
+- Two-factor authentication
+- Profile management
+
+Auth views are Volt components in `resources/views/livewire/auth/` and settings in `resources/views/livewire/settings/`.
+
+### Database Conventions
+
+- Use anonymous migrations (no class names)
+- Foreign keys should use `constrained()` with `cascadeOnDelete()` where appropriate
+- Add indexes on frequently queried columns (slugs, foreign keys)
+- Use Eloquent attribute casting v2 syntax
+
+### Models and Relationships
+
+Models are in `app/Models/`. When creating relationships for the forum features:
+
+- User hasMany Discussions, Replies, Likes, Watchers
+- Channel hasMany Discussions
+- Discussion belongsTo User, Channel; hasMany Replies, Watchers
+- Reply belongsTo User, Discussion; hasMany Likes
+
+Use eager loading to prevent N+1 queries.
+
+### Testing Strategy
+
+Pest PHP with Laravel plugin is configured. Tests use:
+- `RefreshDatabase` trait for Feature tests
+- SQLite in-memory database
+- Factory pattern for test data
+
+Test structure:
+- `tests/Feature/` - Feature/integration tests
+- `tests/Unit/` - Unit tests
+- `tests/Pest.php` - Global test configuration
+
+### Frontend Assets
+
+- Entry points: `resources/css/app.css` and `resources/js/app.js`
+- Vite handles hot module replacement in development
+- Tailwind CSS 4 with JIT compilation
+- Use Flux components for UI elements (documentation at https://fluxui.dev)
+
+### Queue and Jobs
+
+Queue connection defaults to `database` (configured in .env). Queue jobs should be placed in `app/Jobs/`.
+
+Process queued jobs:
+```bash
+php artisan queue:work
+```
+
+### Code Style Guidelines
+
+- Follow PSR-12 coding standards (enforced by Pint)
+- Use Laravel's latest features and conventions
+- Prefer single-action controllers where appropriate
+- Use route model binding with custom keys for SEO
+- Implement authorization using Policies (in `app/Policies/`)
+
+### Security Practices
+
+- All forms include CSRF protection automatically
+- Use Eloquent/Query Builder to prevent SQL injection
+- Sanitize markdown content before rendering
+- Implement authorization checks using Gates and Policies
+- Rate limiting configured on authentication routes
+
+### Performance Considerations
+
+- Eager load relationships to avoid N+1 queries
+- Cache configuration in production
+- Use database queue driver (not sync) in production
+- Queue notification emails
+- Add database indexes on foreign keys and searchable fields
+
+## Forum Application Features
+
+This application is being built as a StackOverflow-style forum with the following planned features:
+
+### Database Schema
+
+#### Users Table
+- id, name, email, password (nullable for OAuth)
+- avatar (nullable), admin (boolean), points (integer, default 50)
+- email_verified_at, remember_token, timestamps
+
+#### Channels Table
+- id, title, slug (unique), description (nullable), timestamps
+
+#### Discussions Table
+- id, user_id (FK), channel_id (FK), title, slug (unique)
+- content (text), views (integer, default 0), timestamps
+
+#### Replies Table
+- id, user_id (FK), discussion_id (FK), content (text)
+- best_answer (boolean, default false), timestamps
+
+#### Likes Table
+- id, user_id (FK), reply_id (FK), timestamps
 - Unique constraint on (user_id, reply_id)
 
-### Watchers Table
-- id (primary key)
-- user_id (foreign key -> users)
-- discussion_id (foreign key -> discussions)
-- timestamps
+#### Watchers Table
+- id, user_id (FK), discussion_id (FK), timestamps
 - Unique constraint on (user_id, discussion_id)
 
-### Social Identities Table
-- id (primary key)
-- user_id (foreign key -> users)
-- provider (string) - e.g., 'google', 'github'
-- provider_user_id (string)
-- access_token (text)
-- refresh_token (text, nullable)
-- timestamps
-- Unique constraint on (provider, provider_user_id)
+### Planned Routes Structure
 
-## Implementation Steps
+**Public:**
+- GET / - Forum listing
+- GET /discussions - All discussions
+- GET /channel/{channel:slug} - Discussions by channel
+- GET /discussion/{discussion:slug} - Single discussion view
 
-### Phase 1: Project Setup
-1. Install Laravel 12: `composer create-project laravel/laravel forum`
-2. Configure database in .env file
-3. Install Laravel Breeze: `composer require laravel/breeze --dev`
-4. Setup authentication: `php artisan breeze:install`
-5. Install Socialite: `composer require laravel/socialite`
-6. Install Markdown parser: `composer require league/commonmark`
+**Authenticated:**
+- Discussion CRUD: POST/PATCH/DELETE /discussions
+- Reply CRUD: POST/PATCH/DELETE /replies
+- POST /replies/{reply}/like - Toggle like
+- POST /discussions/{discussion}/watch - Toggle watch
+- POST /replies/{reply}/best-answer - Mark best answer
 
-### Phase 2: Database Structure
-1. Create migrations for all tables with foreign keys and constraints
-2. Add indexes on frequently queried columns (slug, email)
-3. Create model factories for testing
-4. Create seeders for channels and test users
-5. Run migrations: `php artisan migrate --seed`
+**Admin:**
+- Resource /admin/channels - Channel management
 
-### Phase 3: Models and Relationships
-1. Create Eloquent models: Channel, Discussion, Reply, Like, Watcher
-2. Define relationships:
-   - User hasMany Discussions, Replies, Likes, Watchers
-   - Channel hasMany Discussions
-   - Discussion belongsTo User, Channel; hasMany Replies, Watchers
-   - Reply belongsTo User, Discussion; hasMany Likes
-   - Like belongsTo User, Reply
-   - Watcher belongsTo User, Discussion
-3. Add attribute casting (timestamps, booleans)
-4. Implement slug generation using Laravel's Str::slug() in observers or mutators
+### Authorization Policies
 
-### Phase 4: Routes and Controllers
+- **DiscussionPolicy:** update/delete (owner only), markBestAnswer (owner only)
+- **ReplyPolicy:** update/delete (owner only)
+- **ChannelPolicy:** manage (admin only)
 
-#### Routes (web.php)
-// Public routes 
-* GET / - Home/Forum listing 
-* GET /discussions - All discussions 
-* GET /channel/{channel:slug} - Discussions by channel 
-* GET /discussion/{discussion:slug} - Single discussion view
-
-// Authenticated routes 
-* POST /discussions - Create discussion 
-* GET /discussions/create - Create form 
-* PATCH /discussions/{discussion} - Update discussion 
-* DELETE /discussions/{discussion} - Delete discussion 
-* POST /discussions/{discussion}/replies - Create reply 
-* PATCH /replies/{reply} - Update reply 
-* DELETE /replies/{reply} - Delete reply 
-* POST /replies/{reply}/like - Like/unlike reply 
-* POST /discussions/{discussion}/watch - Watch/unwatch discussion 
-* POST /replies/{reply}/best-answer - Mark as best answer
-// Admin routes 
-* Resource /admin/channels - Channel CRUD
-
-// OAuth routes 
-* GET /auth/{provider} - Redirect to provider 
-* GET /auth/{provider}/callback - Handle provider callback
-
-#### Controllers
-- ForumController - Discussion listing, filtering
-- DiscussionController - CRUD operations
-- ReplyController - Reply CRUD, like/unlike, best answer
-- ChannelController - Admin CRUD
-- WatcherController - Watch/unwatch functionality
-- SocialAuthController - OAuth handling
-
-### Phase 5: Authorization Policies
-Create policies for:
-- DiscussionPolicy: update, delete (owner only), markBestAnswer (owner only)
-- ReplyPolicy: update, delete (owner only)
-- ChannelPolicy: manage (admin only)
-
-### Phase 6: Views and Frontend
-1. Create layouts with Blade components
-2. Discussion listing with pagination
-3. Single discussion view with replies
-4. Markdown editor integration (e.g., EasyMDE, SimpleMDE)
-5. Real-time like counter (Alpine.js or Livewire)
-6. Responsive design with Tailwind CSS
-
-### Phase 7: Features Implementation
-
-#### Slug Generation
-Use Laravel Observers or model events to auto-generate slugs from titles
-
-#### Markdown Rendering
-Create a custom Blade directive or helper function to parse markdown:
-```php
-use League\CommonMark\CommonMarkConverter;
-
-function markdown($text) {
-    $converter = new CommonMarkConverter();
-    return $converter->convert($text);
-}
-````
-
-### **Like System**
-
-Toggle-based like/unlike functionality with optimistic UI updates
-
-### **Watch System**
-
-* Send notifications when new replies are posted
-* Use Laravel Notifications or queued jobs
-* Email digest option
-
-### **Points System**
+### Points System
 
 Award points for:
+- Creating discussions (+5)
+- Posting replies (+3)
+- Receiving likes (+2)
+- Best answer selected (+15)
+- Best answer given (+5)
 
-* Creating discussions (+5)
-* Posting replies (+3)
-* Receiving likes (+2)
-* Best answer selected (+15)
-* Best answer given (+5)
+### Implementation Notes
 
-### **Best Answer**
-
-* Only discussion author can mark best answer
-* Only one best answer per discussion
-* Highlight visually in UI
-
-## **Phase 8: Advanced Features**
-
-### **Search Functionality**
-
-* Laravel Scout with Meilisearch/Algolia
-* Search discussions by title, content, author
-* Filter by channel, date range
-
-### **Spam Prevention**
-
-* Rate limiting on posting
-* CAPTCHA on registration
-* Content moderation flags
-
-### **User Profiles**
-
-* View user's discussions and replies
-* Display reputation points
-* Edit profile and avatar
-
-### **Notifications**
-
-* Email notifications for watched discussions
-* In-app notification center
-* Configurable notification preferences
-
-### **Admin Dashboard**
-
-* User management
-* Content moderation
-* Channel management
-* Analytics and statistics
-
-### **Testing Strategy**
-
-* Feature tests for all CRUD operations
-* Policy tests for authorization
-* Unit tests for business logic (points calculation, best answer)
-* Browser tests with Laravel Dusk for critical user flows
-
-### **Security Considerations**
-
-* CSRF protection on all forms
-* SQL injection prevention (use Eloquent/Query Builder)
-* XSS protection (escape output, sanitize markdown)
-* Authorization checks on all routes
-* Rate limiting on API endpoints
-* Validate and sanitize user input
-
-### **Performance Optimization**
-
-* Eager loading relationships to prevent N+1 queries
-* Cache popular discussions and channels
-* Queue notification emails
-* Database indexes on foreign keys and search fields
-* Lazy loading for long discussion threads
-* CDN for static assets and avatars
-
-### **Deployment Checklist**
-
-* Set `APP_ENV=production`
-* Enable caching: `php artisan config:cache`, `php artisan route:cache`
-* Setup queue workers for background jobs
-* Configure email service (Mailgun, SendGrid, SES)
-* Setup SSL certificate
-* Configure backup strategy
-* Enable error logging and monitoring (Sentry, Flare)
-
-### **Modern Laravel 12 Specific Updates**
-
-* Use anonymous migrations (no class name required)
-* Leverage Eloquent attribute casting v2
-* Use model factories with states
-* Implement route model binding with custom keys
-* Use single-action controllers where appropriate
-* Leverage Laravel Pint for code styling
-* Use Pest PHP for testing (optional)
-
+- Use Laravel Observers for slug generation from titles
+- Implement markdown support (consider `league/commonmark`)
+- Best answer: only one per discussion, only discussion author can mark
+- Watch system: notify users of new replies (use queued notifications)
+- Use Livewire for interactive features (likes, watch toggles)

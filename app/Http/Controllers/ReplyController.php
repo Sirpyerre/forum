@@ -8,11 +8,6 @@ use Illuminate\Http\Request;
 
 class ReplyController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     /**
      * Store a new reply to a discussion.
      */

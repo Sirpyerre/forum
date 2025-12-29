@@ -9,11 +9,6 @@ use Illuminate\Support\Str;
 
 class DiscussionController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['index', 'show']);
-    }
-
     /**
      * Show the form for creating a new discussion.
      */

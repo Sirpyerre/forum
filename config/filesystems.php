@@ -60,7 +60,30 @@ return [
             'report' => false,
         ],
 
+        'cloudinary' => [
+            'driver' => 'cloudinary',
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'api_key' => env('CLOUDINARY_API_KEY'),
+            'api_secret' => env('CLOUDINARY_API_SECRET'),
+            'url' => [
+                'secure' => true,
+            ],
+        ],
+
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Image Storage Disk
+    |--------------------------------------------------------------------------
+    |
+    | This disk will be used for storing uploaded images. You can easily
+    | switch between local (public), s3, or cloudinary by changing the
+    | IMAGES_DISK environment variable.
+    |
+    */
+
+    'images' => env('IMAGES_DISK', 'public'),
 
     /*
     |--------------------------------------------------------------------------

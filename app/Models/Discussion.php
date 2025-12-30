@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Searchable;
 
 class Discussion extends Model
@@ -67,6 +68,14 @@ class Discussion extends Model
     public function watchers(): HasMany
     {
         return $this->hasMany(Watcher::class);
+    }
+
+    /**
+     * Get the images for the discussion.
+     */
+    public function images(): MorphMany
+    {
+        return $this->morphMany(Image::class, 'imageable')->orderBy('order');
     }
 
     /**

@@ -61,7 +61,7 @@ class ChannelController extends Controller
     public function update(Request $request, Channel $channel)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255|unique:channels,title,' . $channel->id,
+            'title' => 'required|string|max:255|unique:channels,title,'.$channel->id,
             'description' => 'nullable|string|max:500',
         ]);
 

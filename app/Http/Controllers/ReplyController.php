@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Badge;
 use App\Models\Discussion;
 use App\Models\Reply;
+use App\Notifications\BestAnswerNotification;
+use App\Notifications\NewReplyNotification;
 use Illuminate\Http\Request;
 
 class ReplyController extends Controller
@@ -24,6 +27,24 @@ class ReplyController extends Controller
 
         // Award points for posting a reply
         auth()->user()->increment('points', 3);
+
+        // Award "First Reply" badge if this is the user's first reply
+        if (auth()->user()->replies()->count() === 1) {
+            $firstReplyBadge = Badge::where('slug', 'first-reply')->first();
+            if ($firstReplyBadge) {
+                auth()->user()->badges()->syncWithoutDetaching($firstReplyBadge);
+            }
+        }
+
+        // Notify watchers about new reply (excluding the reply author)
+        $watchers = $discussion->watchers()
+            ->with('user')
+            ->where('user_id', '!=', auth()->id())
+            ->get();
+
+        foreach ($watchers as $watcher) {
+            $watcher->user->notify(new NewReplyNotification($reply, $discussion));
+        }
 
         return redirect()
             ->route('discussions.show', $discussion)
@@ -109,6 +130,21 @@ class ReplyController extends Controller
         // Award points for best answer
         $reply->user->increment('points', 15);
         $discussion->user->increment('points', 5);
+
+        // Notify the reply author about their best answer
+        $reply->user->notify(new BestAnswerNotification($reply, $discussion));
+
+        // Award "First Best Answer" badge if this is the user's first best answer
+        $bestAnswersCount = Reply::where('user_id', $reply->user_id)
+            ->where('best_answer', true)
+            ->count();
+
+        if ($bestAnswersCount === 1) {
+            $firstBestAnswerBadge = Badge::where('slug', 'first-best-answer')->first();
+            if ($firstBestAnswerBadge) {
+                $reply->user->badges()->syncWithoutDetaching($firstBestAnswerBadge);
+            }
+        }
 
         return back()->with('success', 'Best answer marked!');
     }

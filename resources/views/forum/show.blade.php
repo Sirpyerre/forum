@@ -1,5 +1,13 @@
 @extends('layouts.forum')
 
+@section('title', $discussion->title)
+@section('description', Str::limit(strip_tags(markdown($discussion->content)), 155))
+@section('og_type', 'article')
+@section('og_title', $discussion->title)
+@section('og_description', Str::limit(strip_tags(markdown($discussion->content)), 200))
+@section('og_url', route('discussions.show', $discussion))
+@section('canonical', route('discussions.show', $discussion))
+
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Breadcrumbs -->
@@ -353,6 +361,19 @@
                         <span class="font-medium text-gray-900 dark:text-white">{{ $discussion->user->replies->count() }}</span>
                     </div>
                 </div>
+
+                @if($discussion->user->badges->count() > 0)
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <h4 class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Badges</h4>
+                        <div class="flex flex-wrap gap-1">
+                            @foreach($discussion->user->badges->sortByDesc('points_required')->take(6) as $badge)
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-{{ $badge->color }}-100 dark:bg-{{ $badge->color }}-900/20 text-{{ $badge->color }}-800 dark:text-{{ $badge->color }}-200" title="{{ $badge->description }}">
+                                    {{ $badge->icon }} {{ $badge->name }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- Discussion Stats -->

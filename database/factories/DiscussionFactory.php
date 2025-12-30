@@ -26,7 +26,7 @@ class DiscussionFactory extends Factory
             'user_id' => User::factory(),
             'channel_id' => Channel::factory(),
             'title' => rtrim($title, '.'),
-            'slug' => Str::slug($title) . '-' . fake()->unique()->numberBetween(1000, 9999),
+            'slug' => Str::slug($title).'-'.fake()->unique()->numberBetween(1000, 9999),
             'content' => fake()->paragraphs(rand(2, 5), true),
             'views' => fake()->numberBetween(0, 1000),
         ];

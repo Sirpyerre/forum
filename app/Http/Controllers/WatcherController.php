@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Discussion;
-use Illuminate\Http\Request;
 
 class WatcherController extends Controller
 {

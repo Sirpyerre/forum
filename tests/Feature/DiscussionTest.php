@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Models\{Channel, Discussion, User};
+use App\Models\Channel;
+use App\Models\Discussion;
+use App\Models\User;
 
 test('authenticated user can create a discussion with markdown', function () {
     $user = User::factory()->create(['points' => 50]);

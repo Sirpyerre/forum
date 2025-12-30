@@ -5,7 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }} - Forum</title>
+    {{-- Dynamic Title --}}
+    <title>@yield('title', 'Forum') - {{ config('app.name', 'DevForum') }}</title>
+
+    {{-- Meta Description --}}
+    <meta name="description" content="@yield('description', 'Join our developer community. Ask questions, share knowledge, and connect with developers.')">
+
+    {{-- Open Graph Tags --}}
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:title" content="@yield('og_title', '@yield('title', 'Forum') - ' . config('app.name', 'DevForum'))">
+    <meta property="og:description" content="@yield('og_description', '@yield('description', 'Join our developer community. Ask questions, share knowledge, and connect with developers.')')">
+    <meta property="og:url" content="@yield('og_url', request()->url())">
+    <meta property="og:site_name" content="{{ config('app.name', 'DevForum') }}">
+    @hasSection('og_image')
+    <meta property="og:image" content="@yield('og_image')">
+    @endif
+
+    {{-- Twitter Card Tags --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('twitter_title', '@yield('og_title', '@yield('title', 'Forum') - ' . config('app.name', 'DevForum'))')")>
+    <meta name="twitter:description" content="@yield('twitter_description', '@yield('og_description', '@yield('description', 'Join our developer community.')')')">
+    @hasSection('twitter_image')
+    <meta name="twitter:image" content="@yield('twitter_image', '@yield('og_image')')">
+    @endif
+
+    {{-- Canonical URL --}}
+    <link rel="canonical" href="@yield('canonical', request()->url())">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -32,6 +57,20 @@
                                 </a>
                             @endauth
                         </div>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="flex-1 max-w-md mx-8 hidden md:block">
+                        <form action="{{ route('search') }}" method="GET" class="relative">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input type="text"
+                                   name="q"
+                                   value="{{ request('q') }}"
+                                   placeholder="Search discussions..."
+                                   class="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </form>
                     </div>
 
                     <!-- Right Side -->

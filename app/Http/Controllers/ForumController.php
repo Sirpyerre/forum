@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel;
 use App\Models\Discussion;
-use Illuminate\Http\Request;
 
 class ForumController extends Controller
 {
@@ -60,7 +59,7 @@ class ForumController extends Controller
         $discussion->increment('views');
 
         // Load discussion with relationships
-        $discussion->load(['user', 'channel', 'replies.user', 'replies.likes']);
+        $discussion->load(['user.badges', 'channel', 'replies.user.badges', 'replies.likes']);
 
         // Check if current user is watching this discussion
         $isWatching = auth()->check()

@@ -33,7 +33,7 @@ class DiscussionController extends Controller
         $discussion = auth()->user()->discussions()->create([
             'channel_id' => $validated['channel_id'],
             'title' => $validated['title'],
-            'slug' => Str::slug($validated['title']) . '-' . time(),
+            'slug' => Str::slug($validated['title']).'-'.time(),
             'content' => $validated['content'],
         ]);
 

@@ -4,6 +4,8 @@ use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WatcherController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -11,6 +13,8 @@ use Livewire\Volt\Volt;
 
 // Forum routes
 Route::get('/', [ForumController::class, 'index'])->name('forum.index');
+Route::get('/search', SearchController::class)->name('search');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/channel/{channel:slug}', [ForumController::class, 'channel'])->name('channel.show');
 
 Route::view('dashboard', 'dashboard')

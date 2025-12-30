@@ -1,5 +1,8 @@
 @extends('layouts.forum')
 
+@section('title', 'All Discussions')
+@section('description', 'Browse all discussions in our developer forum. Ask questions, share knowledge, and learn from the community.')
+
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">

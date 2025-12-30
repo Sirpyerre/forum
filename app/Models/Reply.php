@@ -66,4 +66,14 @@ class Reply extends Model
     {
         return $this->morphMany(Image::class, 'imageable')->orderBy('order');
     }
+
+    /**
+     * Boot the model.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Reply $reply) {
+            $reply->images()->get()->each->delete();
+        });
+    }
 }

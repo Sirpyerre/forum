@@ -6,11 +6,14 @@ use App\Models\Channel;
 use App\Models\Discussion;
 use App\Models\Image;
 use App\Services\ImageService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class DiscussionController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Show the form for creating a new discussion.
      */

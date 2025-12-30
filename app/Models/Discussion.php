@@ -79,6 +79,16 @@ class Discussion extends Model
     }
 
     /**
+     * Boot the model.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Discussion $discussion) {
+            $discussion->images()->get()->each->delete();
+        });
+    }
+
+    /**
      * Get the route key for the model.
      */
     public function getRouteKeyName(): string

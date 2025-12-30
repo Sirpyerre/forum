@@ -13,9 +13,9 @@
 
     {{-- Open Graph Tags --}}
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:title" content="@yield('og_title', '@yield('title', 'Forum') - ' . config('app.name', 'DevForum'))">
-    <meta property="og:description" content="@yield('og_description', '@yield('description', 'Join our developer community. Ask questions, share knowledge, and connect with developers.')')">
-    <meta property="og:url" content="@yield('og_url', request()->url())">
+    <meta property="og:title" content="@yield('og_title', config('app.name', 'DevForum'))">
+    <meta property="og:description" content="@yield('og_description', 'Join our developer community. Ask questions, share knowledge, and connect with developers.')">
+    <meta property="og:url" content="{{ request()->url() }}">
     <meta property="og:site_name" content="{{ config('app.name', 'DevForum') }}">
     @hasSection('og_image')
     <meta property="og:image" content="@yield('og_image')">
@@ -23,14 +23,14 @@
 
     {{-- Twitter Card Tags --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('twitter_title', '@yield('og_title', '@yield('title', 'Forum') - ' . config('app.name', 'DevForum'))')")>
-    <meta name="twitter:description" content="@yield('twitter_description', '@yield('og_description', '@yield('description', 'Join our developer community.')')')">
-    @hasSection('twitter_image')
-    <meta name="twitter:image" content="@yield('twitter_image', '@yield('og_image')')">
+    <meta name="twitter:title" content="@yield('og_title', config('app.name', 'DevForum'))">
+    <meta name="twitter:description" content="@yield('og_description', 'Join our developer community. Ask questions, share knowledge, and connect with developers.')">
+    @hasSection('og_image')
+    <meta name="twitter:image" content="@yield('og_image')">
     @endif
 
     {{-- Canonical URL --}}
-    <link rel="canonical" href="@yield('canonical', request()->url())">
+    <link rel="canonical" href="{{ request()->url() }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

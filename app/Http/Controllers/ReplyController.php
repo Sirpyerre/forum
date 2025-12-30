@@ -7,10 +7,13 @@ use App\Models\Discussion;
 use App\Models\Reply;
 use App\Notifications\BestAnswerNotification;
 use App\Notifications\NewReplyNotification;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class ReplyController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Store a new reply to a discussion.
      */

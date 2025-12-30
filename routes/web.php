@@ -17,9 +17,27 @@ Route::get('/search', SearchController::class)->name('search');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/channel/{channel:slug}', [ForumController::class, 'channel'])->name('channel.show');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::get('dashboard', function () {
+    $user = auth()->user();
+
+    // Load user data with relationships
+    $user->load(['badges', 'discussions.channel', 'replies.discussion']);
+
+    // Get watching discussions
+    $watchingDiscussions = \App\Models\Discussion::whereHas('watchers', function ($query) use ($user) {
+        $query->where('user_id', $user->id);
+    })->with(['user', 'channel'])->latest()->take(5)->get();
+
+    // Get recent activity in user's discussions
+    $recentActivity = \App\Models\Reply::whereIn('discussion_id', $user->discussions->pluck('id'))
+        ->where('user_id', '!=', $user->id)
+        ->with(['user', 'discussion'])
+        ->latest()
+        ->take(5)
+        ->get();
+
+    return view('dashboard', compact('user', 'watchingDiscussions', 'recentActivity'));
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     // Settings routes

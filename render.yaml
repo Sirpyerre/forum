@@ -1,0 +1,78 @@
+services:
+  # Web Service (Laravel App)
+  - type: web
+    name: task-manager
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: ./render-build.sh
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_NAME
+        value: TaskManager
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        sync: false
+      - key: APP_KEY
+        generateValue: true
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_LEVEL
+        value: error
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: task-manager-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: task-manager-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: task-manager-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: task-manager-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: task-manager-db
+          property: password
+      - key: BROADCAST_DRIVER
+        value: log
+      - key: CACHE_DRIVER
+        value: database
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_LIFETIME
+        value: 120
+      - key: MAIL_MAILER
+        value: log
+      - key: MAIL_FROM_ADDRESS
+        value: noreply@taskmanager.com
+      - key: MAIL_FROM_NAME
+        value: TaskManager
+      - key: SCOUT_DRIVER
+        value: database
+      - key: FLUX_USERNAME
+        sync: false
+      - key: FLUX_LICENSE_KEY
+        sync: false
+
+databases:
+  # PostgreSQL Database (Free tier: 1GB storage, expires in 90 days)
+  - name: task-manager-db
+    databaseName: task_manager
+    plan: free
+    region: oregon

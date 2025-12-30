@@ -4,12 +4,6 @@ set -o errexit
 
 echo "🚀 Starting build process..."
 
-# Configure Flux credentials if available
-if [ -n "$FLUX_USERNAME" ] && [ -n "$FLUX_LICENSE_KEY" ]; then
-    echo "🔑 Configuring Flux credentials..."
-    composer config http-basic.composer.fluxui.dev "$FLUX_USERNAME" "$FLUX_LICENSE_KEY"
-fi
-
 # Install PHP dependencies
 echo "📦 Installing Composer dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction

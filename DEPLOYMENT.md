@@ -81,25 +81,9 @@ SCOUT_DRIVER=database
 MAIL_MAILER=log
 MAIL_FROM_ADDRESS=noreply@taskmanager.com
 MAIL_FROM_NAME=TaskManager
-
-# Flux UI Credentials (necesario para instalar dependencias)
-FLUX_USERNAME=tu_email_flux
-FLUX_LICENSE_KEY=tu_license_key_flux
 ```
 
 4. Click "Create Web Service"
-
-### 📝 Nota Importante sobre Flux UI
-
-Este proyecto usa Flux UI. Para que el build funcione, necesitas:
-
-1. Agregar tus credenciales de Flux en las variables de entorno de Render:
-   - `FLUX_USERNAME`: Tu email de cuenta Flux
-   - `FLUX_LICENSE_KEY`: Tu license key de Flux
-
-2. También agregar estos secretos en GitHub para CI/CD:
-   - Ve a tu repositorio → Settings → Secrets and variables → Actions
-   - Agrega: `FLUX_USERNAME` y `FLUX_LICENSE_KEY`
 
 ## 🔄 CI/CD con GitHub Actions
 

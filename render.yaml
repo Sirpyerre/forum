@@ -65,10 +65,6 @@ services:
         value: TaskManager
       - key: SCOUT_DRIVER
         value: database
-      - key: FLUX_USERNAME
-        sync: false
-      - key: FLUX_LICENSE_KEY
-        sync: false
 
 databases:
   # PostgreSQL Database (Free tier: 1GB storage, expires in 90 days)

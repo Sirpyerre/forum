@@ -11,15 +11,7 @@ git commit -m "Add deployment configuration for Render.com"
 git push origin main
 ```
 
-### 2️⃣ Configurar Secretos en GitHub (para CI/CD)
-
-1. Ve a tu repositorio en GitHub
-2. Settings → Secrets and variables → Actions → New repository secret
-3. Agrega:
-   - `FLUX_USERNAME` = tu email de Flux UI
-   - `FLUX_LICENSE_KEY` = tu license key de Flux UI
-
-### 3️⃣ Deploy en Render.com
+### 2️⃣ Deploy en Render.com
 
 **Opción A: Con Blueprint (Automático - Recomendado)**
 1. Ve a [Render Dashboard](https://dashboard.render.com)
@@ -27,9 +19,7 @@ git push origin main
 3. Conecta tu repositorio de GitHub
 4. Selecciona el repositorio
 5. Render detectará `render.yaml` y creará todo automáticamente
-6. Agrega las variables de entorno faltantes:
-   - `FLUX_USERNAME`
-   - `FLUX_LICENSE_KEY`
+6. Agrega la variable de entorno:
    - `APP_URL` (después de que se cree el servicio)
 7. ✅ Listo!
 
@@ -81,9 +71,6 @@ GitHub Actions ejecutará tests automáticamente, y si pasan, Render desplegará
 php artisan key:generate --show
 # Agrega el key a variables de entorno como APP_KEY
 ```
-
-**Error: "Flux authentication required"**
-- Verifica que `FLUX_USERNAME` y `FLUX_LICENSE_KEY` estén en las variables de entorno de Render
 
 **Build falla**
 - Revisa logs en Render

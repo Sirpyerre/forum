@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs'
 import { marked } from 'marked'
+import 'flowbite'
 
 // Configure marked options
 marked.setOptions({

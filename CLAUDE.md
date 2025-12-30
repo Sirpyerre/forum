@@ -228,6 +228,30 @@ This application is being built as a StackOverflow-style forum with the followin
 - id, user_id (FK), discussion_id (FK), timestamps
 - Unique constraint on (user_id, discussion_id)
 
+#### Images Table
+- id, imageable_type (polymorphic), imageable_id (polymorphic)
+- filename, path, disk (storage driver)
+- mime_type, size (bytes), width, height
+- alt_text (nullable), order (integer, default 0)
+- timestamps
+- Polymorphic relation to Discussions and Replies
+- Auto-deleted when parent model is deleted
+
+### Image Upload System
+
+The application includes a complete image upload system:
+
+- **Multi-image uploads** with drag & drop (Livewire)
+- **Storage drivers:** Local, S3, Cloudinary (configurable via `IMAGES_DISK` env)
+- **Automatic optimization:** Resize to max 1200px width, 85% quality
+- **Validation:** Max 5MB per image, allowed types: JPG, PNG, GIF, WebP
+- **Limits:** 5 images per Discussion, 3 per Reply
+- **Components:** `image-uploader` and `image-gallery` Livewire components
+- **Service:** `ImageService` for handling uploads and optimization
+- **Cascade deletion:** Images deleted automatically when Discussion/Reply deleted
+
+See `docs/IMAGE_UPLOAD.md` for complete documentation.
+
 ### Planned Routes Structure
 
 **Public:**

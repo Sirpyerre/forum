@@ -15,21 +15,19 @@
         <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
-                    <div class="flex">
+                    <div class="flex items-center gap-8">
                         <!-- Logo -->
-                        <div class="shrink-0 flex items-center">
-                            <a href="{{ route('forum.index') }}" class="text-xl font-bold text-gray-900 dark:text-white">
-                                {{ config('app.name', 'Laravel') }}
-                            </a>
-                        </div>
+                        <a href="{{ route('forum.index') }}" class="text-xl font-bold text-gray-900 dark:text-white">
+                            DevForum
+                        </a>
 
                         <!-- Navigation Links -->
-                        <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <a href="{{ route('forum.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('forum.index') ? 'border-indigo-400 dark:border-indigo-600' : 'border-transparent' }} text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <div class="flex gap-6">
+                            <a href="{{ route('forum.index') }}" class="text-sm font-medium {{ request()->routeIs('forum.*') || request()->routeIs('channel.*') || request()->routeIs('discussions.*') ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}">
                                 Forum
                             </a>
                             @auth
-                                <a href="{{ route('dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                                <a href="{{ route('dashboard') }}" class="text-sm font-medium {{ request()->routeIs('dashboard') ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white' }}">
                                     Dashboard
                                 </a>
                             @endauth
@@ -39,18 +37,23 @@
                     <!-- Right Side -->
                     <div class="flex items-center gap-4">
                         @auth
-                            <a href="{{ route('discussions.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                            <a href="{{ route('discussions.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-medium text-sm text-white hover:bg-indigo-700 transition">
                                 New Discussion
                             </a>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm text-gray-700 dark:text-gray-300">{{ auth()->user()->points }} points</span>
-                                <a href="{{ route('profile.edit') }}" class="text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
-                                    {{ auth()->user()->name }}
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                    <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                    </svg>
+                                    {{ auth()->user()->points }} points
+                                </span>
+                                <a href="{{ route('profile.edit') }}" class="flex items-center justify-center w-10 h-10 bg-indigo-600 text-white rounded-full font-semibold text-sm hover:bg-indigo-700 transition">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                                 </a>
                             </div>
                         @else
-                            <a href="{{ route('login') }}" class="text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">Log in</a>
-                            <a href="{{ route('register') }}" class="text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">Register</a>
+                            <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Log in</a>
+                            <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-medium text-sm text-white hover:bg-indigo-700 transition">Register</a>
                         @endauth
                     </div>
                 </div>

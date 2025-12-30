@@ -20,7 +20,13 @@ class ForumController extends Controller
 
         $channels = Channel::withCount('discussions')->get();
 
-        return view('forum.index', compact('discussions', 'channels'));
+        // Forum statistics
+        $totalDiscussions = Discussion::count();
+        $activeMembers = \App\Models\User::count();
+        $todaysPosts = Discussion::whereDate('created_at', today())->count()
+            + \App\Models\Reply::whereDate('created_at', today())->count();
+
+        return view('forum.index', compact('discussions', 'channels', 'totalDiscussions', 'activeMembers', 'todaysPosts'));
     }
 
     /**
@@ -36,7 +42,13 @@ class ForumController extends Controller
 
         $channels = Channel::withCount('discussions')->get();
 
-        return view('forum.channel', compact('channel', 'discussions', 'channels'));
+        // Forum statistics
+        $totalDiscussions = Discussion::count();
+        $activeMembers = \App\Models\User::count();
+        $todaysPosts = Discussion::whereDate('created_at', today())->count()
+            + \App\Models\Reply::whereDate('created_at', today())->count();
+
+        return view('forum.channel', compact('channel', 'discussions', 'channels', 'totalDiscussions', 'activeMembers', 'todaysPosts'));
     }
 
     /**

@@ -12,7 +12,6 @@ use Livewire\Volt\Volt;
 // Forum routes
 Route::get('/', [ForumController::class, 'index'])->name('forum.index');
 Route::get('/channel/{channel:slug}', [ForumController::class, 'channel'])->name('channel.show');
-Route::get('/discussions/{discussion:slug}', [ForumController::class, 'show'])->name('discussions.show');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -37,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 
-    // Discussion routes
+    // Discussion routes (authenticated)
     Route::get('/discussions/create', [DiscussionController::class, 'create'])->name('discussions.create');
     Route::post('/discussions', [DiscussionController::class, 'store'])->name('discussions.store');
     Route::get('/discussions/{discussion:slug}/edit', [DiscussionController::class, 'edit'])->name('discussions.edit');
@@ -54,6 +53,9 @@ Route::middleware(['auth'])->group(function () {
     // Watcher routes
     Route::post('/discussions/{discussion}/watch', [WatcherController::class, 'toggle'])->name('discussions.watch');
 });
+
+// Discussion show route (public, must be after specific routes like 'create' and 'edit')
+Route::get('/discussions/{discussion:slug}', [ForumController::class, 'show'])->name('discussions.show');
 
 // Admin routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

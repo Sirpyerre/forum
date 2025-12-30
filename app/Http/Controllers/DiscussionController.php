@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel;
 use App\Models\Discussion;
+use App\Models\Image;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -22,12 +24,13 @@ class DiscussionController extends Controller
     /**
      * Store a newly created discussion.
      */
-    public function store(Request $request)
+    public function store(Request $request, ImageService $imageService)
     {
         $validated = $request->validate([
             'channel_id' => 'required|exists:channels,id',
             'title' => 'required|string|max:255',
             'content' => 'required|string|min:10',
+            'images.*' => 'nullable|image|max:5120', // 5MB max per image
         ]);
 
         $discussion = auth()->user()->discussions()->create([
@@ -36,6 +39,20 @@ class DiscussionController extends Controller
             'slug' => Str::slug($validated['title']).'-'.time(),
             'content' => $validated['content'],
         ]);
+
+        // Handle image uploads
+        if ($request->hasFile('images')) {
+            $disk = config('filesystems.images');
+            foreach ($request->file('images') as $index => $image) {
+                $imageService->setDisk($disk)->uploadAndOptimize(
+                    $image,
+                    $discussion,
+                    null, // alt_text
+                    1200, // max width
+                    85    // quality
+                );
+            }
+        }
 
         // Award points for creating a discussion
         auth()->user()->increment('points', 5);
@@ -53,6 +70,7 @@ class DiscussionController extends Controller
         $this->authorize('update', $discussion);
 
         $channels = Channel::all();
+        $discussion->load('images');
 
         return view('discussions.edit', compact('discussion', 'channels'));
     }
@@ -60,7 +78,7 @@ class DiscussionController extends Controller
     /**
      * Update the specified discussion.
      */
-    public function update(Request $request, Discussion $discussion)
+    public function update(Request $request, Discussion $discussion, ImageService $imageService)
     {
         $this->authorize('update', $discussion);
 
@@ -68,6 +86,9 @@ class DiscussionController extends Controller
             'channel_id' => 'required|exists:channels,id',
             'title' => 'required|string|max:255',
             'content' => 'required|string|min:10',
+            'images.*' => 'nullable|image|max:5120', // 5MB max per image
+            'removed_images' => 'nullable|array',
+            'removed_images.*' => 'exists:images,id',
         ]);
 
         $discussion->update([
@@ -75,6 +96,29 @@ class DiscussionController extends Controller
             'title' => $validated['title'],
             'content' => $validated['content'],
         ]);
+
+        // Handle image removals
+        if ($request->has('removed_images')) {
+            Image::whereIn('id', $request->removed_images)
+                ->where('imageable_type', Discussion::class)
+                ->where('imageable_id', $discussion->id)
+                ->get()
+                ->each(fn ($image) => $image->delete());
+        }
+
+        // Handle new image uploads
+        if ($request->hasFile('images')) {
+            $disk = config('filesystems.images');
+            foreach ($request->file('images') as $index => $image) {
+                $imageService->setDisk($disk)->uploadAndOptimize(
+                    $image,
+                    $discussion,
+                    null, // alt_text
+                    1200, // max width
+                    85    // quality
+                );
+            }
+        }
 
         return redirect()
             ->route('discussions.show', $discussion)

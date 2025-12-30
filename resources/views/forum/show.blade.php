@@ -142,6 +142,16 @@
                             <div class="prose prose-indigo dark:prose-invert max-w-none">
                                 {!! markdown($discussion->content) !!}
                             </div>
+
+                            <!-- Discussion Images -->
+                            @if($discussion->images->count() > 0)
+                                <div class="mt-6">
+                                    @livewire('components.image-gallery', [
+                                        'images' => $discussion->images,
+                                        'columns' => 4
+                                    ])
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -224,6 +234,16 @@
                                         <div class="prose prose-sm prose-indigo dark:prose-invert max-w-none">
                                             {!! markdown($reply->content) !!}
                                         </div>
+
+                                        <!-- Reply Images -->
+                                        @if($reply->images->count() > 0)
+                                            <div class="mt-4">
+                                                @livewire('components.image-gallery', [
+                                                    'images' => $reply->images,
+                                                    'columns' => 3
+                                                ])
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -314,6 +334,15 @@
                             <template x-if="preview.trim() !== ''">
                                 <div class="prose prose-sm prose-indigo dark:prose-invert max-w-none" x-html="window.marked.parse(preview)"></div>
                             </template>
+                        </div>
+
+                        <!-- Images -->
+                        <div class="mt-4">
+                            @livewire('components.image-uploader', [
+                                'maxFiles' => 3,
+                                'label' => 'Attach Images (Optional)',
+                                'help' => 'Supported: JPG, PNG, GIF, WebP. Max 5MB per image, 3 images total.'
+                            ])
                         </div>
 
                         <div class="mt-4">

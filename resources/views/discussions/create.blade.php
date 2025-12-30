@@ -118,6 +118,15 @@
                 @enderror
             </div>
 
+            <!-- Images -->
+            <div>
+                @livewire('components.image-uploader', [
+                    'maxFiles' => 5,
+                    'label' => 'Attach Images (Optional)',
+                    'help' => 'Supported: JPG, PNG, GIF, WebP. Max 5MB per image, 5 images total.'
+                ])
+            </div>
+
             <!-- Actions -->
             <div class="flex items-center justify-between pt-4">
                 <a href="{{ route('forum.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">

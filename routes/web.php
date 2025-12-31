@@ -49,6 +49,52 @@ Route::get('/run-migrations', function () {
     }
 });
 
+// Seed route - REMOVE AFTER FIXING
+Route::get('/run-seeders', function () {
+    try {
+        Artisan::call('db:seed', ['--force' => true]);
+        $output = Artisan::output();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database seeded successfully',
+            'output' => $output,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+});
+
+// Migrate + Seed route (all in one) - REMOVE AFTER FIXING
+Route::get('/run-migrations-and-seed', function () {
+    try {
+        // Run migrations
+        Artisan::call('migrate', ['--force' => true]);
+        $migrationsOutput = Artisan::output();
+
+        // Run seeders
+        Artisan::call('db:seed', ['--force' => true]);
+        $seedersOutput = Artisan::output();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Migrations and seeders executed successfully',
+            'migrations' => $migrationsOutput,
+            'seeders' => $seedersOutput,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+});
+
 // Forum routes
 Route::get('/', [ForumController::class, 'index'])->name('forum.index');
 Route::get('/search', SearchController::class)->name('search');

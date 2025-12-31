@@ -24,8 +24,8 @@ class AppServiceProvider extends ServiceProvider
     {
         User::observe(UserObserver::class);
 
-        // Force HTTPS in production
-        if ($this->app->environment('production')) {
+        // Force HTTPS in production or when RENDER env var is set (Render.com deployment)
+        if ($this->app->environment('production') || env('RENDER')) {
             URL::forceScheme('https');
         }
     }

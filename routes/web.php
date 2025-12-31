@@ -11,6 +11,23 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
+// Debug route - REMOVE AFTER FIXING
+Route::get('/debug-info', function () {
+    return response()->json([
+        'status' => 'Laravel is working!',
+        'php_version' => PHP_VERSION,
+        'laravel_version' => app()->version(),
+        'app_env' => config('app.env'),
+        'app_debug' => config('app.debug'),
+        'app_key_set' => !empty(config('app.key')),
+        'db_connection' => config('database.default'),
+        'db_host' => config('database.connections.pgsql.host'),
+        'db_database' => config('database.connections.pgsql.database'),
+        'timezone' => config('app.timezone'),
+        'url' => config('app.url'),
+    ]);
+});
+
 // Forum routes
 Route::get('/', [ForumController::class, 'index'])->name('forum.index');
 Route::get('/search', SearchController::class)->name('search');

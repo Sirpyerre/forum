@@ -7,6 +7,7 @@ use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WatcherController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -19,13 +20,33 @@ Route::get('/debug-info', function () {
         'laravel_version' => app()->version(),
         'app_env' => config('app.env'),
         'app_debug' => config('app.debug'),
-        'app_key_set' => !empty(config('app.key')),
+        'app_key_set' => ! empty(config('app.key')),
         'db_connection' => config('database.default'),
         'db_host' => config('database.connections.pgsql.host'),
         'db_database' => config('database.connections.pgsql.database'),
         'timezone' => config('app.timezone'),
         'url' => config('app.url'),
     ]);
+});
+
+// Migrate route - REMOVE AFTER FIXING
+Route::get('/run-migrations', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        $output = Artisan::output();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Migrations executed successfully',
+            'output' => $output,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
 });
 
 // Forum routes

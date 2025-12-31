@@ -254,16 +254,16 @@ class DatabaseSeeder extends Seeder
     {
         // Ensure badges exist
         $badges = [
-            ['name' => 'Welcome', 'description' => 'Joined the community', 'points_required' => 0],
-            ['name' => 'Contributor', 'description' => 'Reached 100 points', 'points_required' => 100],
-            ['name' => 'Expert', 'description' => 'Reached 250 points', 'points_required' => 250],
-            ['name' => 'Master', 'description' => 'Reached 500 points', 'points_required' => 500],
-            ['name' => 'Legend', 'description' => 'Reached 1000 points', 'points_required' => 1000],
+            ['name' => 'Welcome', 'slug' => 'welcome', 'description' => 'Joined the community', 'points_required' => 0],
+            ['name' => 'Contributor', 'slug' => 'contributor', 'description' => 'Reached 100 points', 'points_required' => 100],
+            ['name' => 'Expert', 'slug' => 'expert', 'description' => 'Reached 250 points', 'points_required' => 250],
+            ['name' => 'Master', 'slug' => 'master', 'description' => 'Reached 500 points', 'points_required' => 500],
+            ['name' => 'Legend', 'slug' => 'legend', 'description' => 'Reached 1000 points', 'points_required' => 1000],
         ];
 
         foreach ($badges as $badgeData) {
             Badge::firstOrCreate(
-                ['name' => $badgeData['name']],
+                ['slug' => $badgeData['slug']],
                 $badgeData
             );
         }

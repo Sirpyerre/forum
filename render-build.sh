@@ -16,9 +16,9 @@ npm ci
 echo "🎨 Building frontend assets..."
 npm run build
 
-# Clear and cache config
+# Clear and cache config (skip config:cache for now, will be done at runtime)
 echo "⚙️  Optimizing configuration..."
-php artisan config:cache
+# php artisan config:cache  # Skip - will be done at runtime with correct env vars
 php artisan route:cache
 php artisan view:cache
 

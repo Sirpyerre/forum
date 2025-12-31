@@ -142,6 +142,16 @@
                             <div class="prose prose-indigo dark:prose-invert max-w-none">
                                 {!! markdown($discussion->content) !!}
                             </div>
+
+                            <!-- Discussion Images -->
+                            @if($discussion->images->count() > 0)
+                                <div class="mt-6">
+                                    @livewire('components.image-gallery', [
+                                        'images' => $discussion->images,
+                                        'columns' => 4
+                                    ])
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -224,6 +234,16 @@
                                         <div class="prose prose-sm prose-indigo dark:prose-invert max-w-none">
                                             {!! markdown($reply->content) !!}
                                         </div>
+
+                                        <!-- Reply Images -->
+                                        @if($reply->images->count() > 0)
+                                            <div class="mt-4">
+                                                @livewire('components.image-gallery', [
+                                                    'images' => $reply->images,
+                                                    'columns' => 3
+                                                ])
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -236,9 +256,11 @@
             @auth
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Post a Reply</h3>
-                    <form action="{{ route('replies.store', $discussion) }}" method="POST" x-data="{
+                    <form action="{{ route('replies.store', $discussion) }}" method="POST" enctype="multipart/form-data" x-data="{
                         tab: 'write',
                         preview: '',
+                        files: [],
+                        previews: [],
                         insertMarkdown(before, after, placeholder) {
                             const textarea = this.$refs.replyTextarea;
                             const start = textarea.selectionStart;
@@ -250,6 +272,34 @@
                             textarea.value = newText;
                             textarea.focus();
                             textarea.setSelectionRange(start + before.length, start + before.length + textToInsert.length);
+                        },
+                        handleFiles(event) {
+                            const newFiles = Array.from(event.target.files || event.dataTransfer.files);
+                            newFiles.forEach(file => {
+                                if (this.files.length < 3 && file.type.startsWith('image/')) {
+                                    this.files.push(file);
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        this.previews.push({
+                                            url: e.target.result,
+                                            name: file.name,
+                                            size: (file.size / 1024).toFixed(1) + ' KB'
+                                        });
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            });
+                            this.updateFileInput();
+                        },
+                        removeFile(index) {
+                            this.files.splice(index, 1);
+                            this.previews.splice(index, 1);
+                            this.updateFileInput();
+                        },
+                        updateFileInput() {
+                            const dt = new DataTransfer();
+                            this.files.forEach(file => dt.items.add(file));
+                            this.$refs.fileInput.files = dt.files;
                         }
                     }">
                         @csrf
@@ -314,6 +364,84 @@
                             <template x-if="preview.trim() !== ''">
                                 <div class="prose prose-sm prose-indigo dark:prose-invert max-w-none" x-html="window.marked.parse(preview)"></div>
                             </template>
+                        </div>
+
+                        <!-- Images -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Attach Images (Optional)
+                            </label>
+
+                            <!-- Upload Area -->
+                            <div
+                                @dragover.prevent="$el.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/10')"
+                                @dragleave.prevent="$el.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/10')"
+                                @drop.prevent="
+                                    $el.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/10');
+                                    handleFiles($event);
+                                "
+                                class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 transition-colors hover:border-gray-400 dark:hover:border-gray-500"
+                            >
+                                <input
+                                    x-ref="fileInput"
+                                    type="file"
+                                    name="images[]"
+                                    multiple
+                                    accept="image/*"
+                                    @change="handleFiles($event)"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                />
+
+                                <div class="text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <span class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 cursor-pointer">
+                                            Click to upload
+                                        </span>
+                                        or drag and drop
+                                    </p>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                                        Supported: JPG, PNG, GIF, WebP. Max 5MB per image, 3 images total.
+                                    </p>
+                                </div>
+                            </div>
+
+                            @error('images.*')
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+
+                            <!-- Preview Images -->
+                            <div x-show="previews.length > 0" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <template x-for="(preview, index) in previews" :key="index">
+                                    <div class="relative group">
+                                        <div class="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                            <img
+                                                :src="preview.url"
+                                                :alt="preview.name"
+                                                class="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            @click="removeFile(index)"
+                                            class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                        <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded" x-text="preview.size"></div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- File count -->
+                            <p x-show="files.length > 0" class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                <span x-text="files.length"></span> / 3 images
+                                <span x-show="files.length >= 3" class="text-orange-600 dark:text-orange-400">(Maximum reached)</span>
+                            </p>
                         </div>
 
                         <div class="mt-4">

@@ -1,14 +1,27 @@
 # 🚀 Guía Rápida de Deployment
 
+## ⚠️ Estrategia de Branching
+
+Este proyecto usa dos ramas:
+- **`development`** - Trabajo diario (commits directos, quick checks)
+- **`main`** - Producción (solo via PR, pipeline completo, deploy automático)
+
+**Ver [BRANCHING-STRATEGY.md](BRANCHING-STRATEGY.md) para detalles completos.**
+
 ## Pasos para Deploy en Render.com (5 minutos)
 
 ### 1️⃣ Preparar Repositorio GitHub
 
 ```bash
-# Asegúrate de que todos los cambios estén commiteados
+# Trabaja en development normalmente
+git checkout development
 git add .
-git commit -m "Add deployment configuration for Render.com"
-git push origin main
+git commit -m "Add deployment configuration"
+git push origin development
+
+# Cuando estés listo para producción, crea un PR:
+# development → main en GitHub
+# Merge el PR después de que pasen los tests
 ```
 
 ### 2️⃣ Deploy en Render.com

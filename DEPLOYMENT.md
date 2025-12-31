@@ -1,53 +1,53 @@
-# Guía de Deployment - Render.com
+# Deployment Guide - Render.com
 
-Esta guía explica cómo desplegar la aplicación Task Manager en Render.com usando su plan gratuito.
+This guide explains how to deploy the Convene application on Render.com using their free tier.
 
-## 📋 Prerequisitos
+## 📋 Prerequisites
 
-- Cuenta en [Render.com](https://render.com) (gratuita)
-- Cuenta en [GitHub](https://github.com)
-- Repositorio de GitHub con el código de la aplicación
+- [Render.com](https://render.com) account (free)
+- [GitHub](https://github.com) account
+- GitHub repository with the application code
 
-## 🚀 Deployment Automático con Blueprint
+## 🚀 Automatic Deployment with Blueprint
 
-### Opción 1: Deploy con render.yaml (Recomendado)
+### Option 1: Deploy with render.yaml (Recommended)
 
-1. **Conecta tu repositorio a Render**
-   - Ve a [Render Dashboard](https://dashboard.render.com)
-   - Click en "New +" → "Blueprint"
-   - Conecta tu repositorio de GitHub
-   - Selecciona el repositorio `task-manager`
+1. **Connect your repository to Render**
+   - Go to [Render Dashboard](https://dashboard.render.com)
+   - Click "New +" → "Blueprint"
+   - Connect your GitHub repository
+   - Select the `forum` repository
 
-2. **Render detectará automáticamente el archivo `render.yaml`**
-   - Creará un Web Service (Laravel app)
-   - Creará una base de datos PostgreSQL (1GB gratis)
-   - Configurará todas las variables de entorno automáticamente
+2. **Render will automatically detect the `render.yaml` file**
+   - Creates a Web Service (Convene app): `convene`
+   - Creates a PostgreSQL database: `convene-db` (1GB free)
+   - Automatically configures all environment variables
 
-3. **Espera a que el deploy termine** (5-10 minutos primera vez)
+3. **Wait for deployment to finish** (5-10 minutes first time)
 
-4. **¡Listo!** Tu app estará disponible en `https://task-manager-xxxx.onrender.com`
+4. **Done!** Your app will be available at the URL provided by Render.
 
-### Opción 2: Deploy Manual
+### Option 2: Manual Deployment
 
-Si prefieres configurar manualmente:
+If you prefer manual configuration:
 
-#### Paso 1: Crear Base de Datos
+#### Step 1: Create Database
 
-1. En Render Dashboard, click "New +" → "PostgreSQL"
-2. Configura:
-   - **Name:** `task-manager-db`
-   - **Database:** `task_manager`
-   - **Region:** Oregon (más cercano)
+1. In Render Dashboard, click "New +" → "PostgreSQL"
+2. Configure:
+   - **Name:** `convene-db`
+   - **Database:** `convene`
+   - **Region:** Oregon (closest)
    - **Plan:** Free
 3. Click "Create Database"
-4. Guarda las credenciales (las necesitarás después)
+4. Save the credentials (you'll need them later)
 
-#### Paso 2: Crear Web Service
+#### Step 2: Create Web Service
 
 1. Click "New +" → "Web Service"
-2. Conecta tu repositorio de GitHub
-3. Configura:
-   - **Name:** `task-manager`
+2. Connect your GitHub repository
+3. Configure:
+   - **Name:** `convene`
    - **Region:** Oregon
    - **Branch:** `main`
    - **Runtime:** Docker
@@ -55,23 +55,23 @@ Si prefieres configurar manualmente:
    - **Start Command:** `php artisan serve --host=0.0.0.0 --port=$PORT`
    - **Plan:** Free
 
-#### Paso 3: Configurar Variables de Entorno
+#### Step 3: Configure Environment Variables
 
-En la sección "Environment" del Web Service, agrega:
+In the "Environment" section of the Web Service, add:
 
 ```env
-APP_NAME=TaskManager
+APP_NAME=Convene
 APP_ENV=production
 APP_DEBUG=false
-APP_KEY=                          # Se genera automáticamente
-APP_URL=https://tu-app.onrender.com
+APP_KEY=                          # Auto-generated
+APP_URL=https://convene.onrender.com
 
 DB_CONNECTION=pgsql
-DB_HOST=                          # Del PostgreSQL que creaste
+DB_HOST=                          # From PostgreSQL you created
 DB_PORT=5432
-DB_DATABASE=task_manager
-DB_USERNAME=                      # Del PostgreSQL que creaste
-DB_PASSWORD=                      # Del PostgreSQL que creaste
+DB_DATABASE=convene
+DB_USERNAME=                      # From PostgreSQL you created
+DB_PASSWORD=                      # From PostgreSQL you created
 
 CACHE_DRIVER=database
 SESSION_DRIVER=database
@@ -79,68 +79,68 @@ QUEUE_CONNECTION=database
 SCOUT_DRIVER=database
 
 MAIL_MAILER=log
-MAIL_FROM_ADDRESS=noreply@taskmanager.com
-MAIL_FROM_NAME=TaskManager
+MAIL_FROM_ADDRESS=noreply@convene.com
+MAIL_FROM_NAME=Convene
 ```
 
 4. Click "Create Web Service"
 
-## 🔄 CI/CD con GitHub Actions
+## 🔄 CI/CD with GitHub Actions
 
-El proyecto incluye un workflow de CI/CD que:
+The project includes a CI/CD workflow that:
 
-- ✅ Ejecuta todos los tests
-- ✅ Verifica el código con Pint
-- ✅ Compila assets de frontend
-- ✅ Notifica cuando está listo para deploy
+- ✅ Runs all tests
+- ✅ Checks code with Pint
+- ✅ Compiles frontend assets
+- ✅ Notifies when ready to deploy
 
-### Workflow Automático
+### Automatic Workflow
 
-1. **En Pull Requests:** Ejecuta tests y validaciones
-2. **En Push a `main`:** Ejecuta tests + activa deploy automático en Render
+1. **On Pull Requests:** Runs tests and validations
+2. **On Push to `main`:** Runs tests + triggers automatic deploy on Render
 
-Para ver el estado del workflow:
-- Ve a tu repositorio en GitHub
-- Click en la pestaña "Actions"
-- Verás todos los workflows ejecutándose
+To see workflow status:
+- Go to your repository on GitHub
+- Click on "Actions" tab
+- You'll see all workflows running
 
-## 📊 Monitoreo y Logs
+## 📊 Monitoring and Logs
 
-### Ver Logs en Tiempo Real
+### View Real-time Logs
 
-1. Ve a tu Web Service en Render Dashboard
-2. Click en la pestaña "Logs"
-3. Los logs se actualizan automáticamente
+1. Go to your Web Service in Render Dashboard
+2. Click on "Logs" tab
+3. Logs update automatically
 
-### Métricas y Performance
+### Metrics and Performance
 
-1. Pestaña "Metrics" muestra:
+1. "Metrics" tab shows:
    - CPU usage
    - Memory usage
    - Request count
    - Response times
 
-## 🔧 Comandos Útiles
+## 🔧 Useful Commands
 
-### Ejecutar Migraciones Manualmente
+### Run Migrations Manually
 
-Si necesitas ejecutar migraciones después del deploy:
+If you need to run migrations after deployment:
 
-1. Ve a tu Web Service → Shell
-2. Ejecuta:
+1. Go to your Web Service → Shell
+2. Execute:
    ```bash
    php artisan migrate --force
    ```
 
-### Seed Database (Primera vez)
+### Seed Database (First time)
 
-Para poblar la base de datos con datos de ejemplo:
+To populate database with sample data:
 
-1. Agrega variable de entorno: `SEED_DATABASE=true`
-2. Re-deploya la aplicación
-3. Después del deploy, remueve o cambia a `SEED_DATABASE=false`
+1. Add environment variable: `SEED_DATABASE=true`
+2. Re-deploy the application
+3. After deployment, remove or change to `SEED_DATABASE=false`
 
-### Limpiar Cache
+### Clear Cache
 
 ```bash
 php artisan cache:clear
@@ -149,54 +149,54 @@ php artisan route:clear
 php artisan view:clear
 ```
 
-### Re-indexar Search
+### Re-index Search
 
 ```bash
 php artisan scout:import "App\Models\Discussion"
 ```
 
-## ⚠️ Limitaciones del Plan Gratuito
+## ⚠️ Free Tier Limitations
 
 - **Web Service:**
-  - Se duerme después de 15 minutos de inactividad
-  - Primera petición después de dormir toma ~30 segundos
-  - 750 horas de compute gratis/mes
+  - Sleeps after 15 minutes of inactivity
+  - First request after sleep takes ~30 seconds
+  - 750 compute hours free/month
 
 - **PostgreSQL:**
-  - 1GB de almacenamiento
-  - Expira después de 90 días (puedes crear nueva base de datos)
-  - Backups no incluidos
+  - 1GB storage
+  - Expires after 90 days (you can create a new database)
+  - Backups not included
 
-- **Ancho de Banda:**
-  - 100GB/mes gratis
+- **Bandwidth:**
+  - 100GB/month free
 
 ## 🚨 Troubleshooting
 
 ### Error: "Application key not set"
 
 ```bash
-# En Render Shell
+# In Render Shell
 php artisan key:generate --show
-# Copia el key y agrégalo a las variables de entorno como APP_KEY
+# Copy the key and add it to environment variables as APP_KEY
 ```
 
 ### Error: "No such file or directory (storage)"
 
 ```bash
-# En Render Shell
+# In Render Shell
 php artisan storage:link
 ```
 
-### Error de Migraciones
+### Migration Errors
 
-1. Verifica que la base de datos esté conectada
-2. Checa las credenciales en las variables de entorno
-3. Ejecuta migraciones manualmente desde Shell
+1. Verify database is connected
+2. Check credentials in environment variables
+3. Run migrations manually from Shell
 
-### Build Falla
+### Build Fails
 
-1. Revisa los logs del build en Render
-2. Asegúrate de que `render-build.sh` tenga permisos de ejecución:
+1. Review build logs in Render
+2. Ensure `render-build.sh` has execution permissions:
    ```bash
    chmod +x render-build.sh
    git add render-build.sh
@@ -204,49 +204,49 @@ php artisan storage:link
    git push
    ```
 
-## 📧 Configurar Email (Opcional)
+## 📧 Configure Email (Optional)
 
-Para enviar emails reales en producción, puedes usar:
+To send real emails in production, you can use:
 
-### Opción 1: Resend (Recomendado - Gratis)
+### Option 1: Resend (Recommended - Free)
 
-1. Crea cuenta en [Resend.com](https://resend.com)
-2. Genera API Key
-3. Actualiza variables de entorno:
+1. Create account at [Resend.com](https://resend.com)
+2. Generate API Key
+3. Update environment variables:
    ```env
    MAIL_MAILER=smtp
    MAIL_HOST=smtp.resend.com
    MAIL_PORT=587
    MAIL_USERNAME=resend
-   MAIL_PASSWORD=tu_api_key
+   MAIL_PASSWORD=your_api_key
    MAIL_ENCRYPTION=tls
-   MAIL_FROM_ADDRESS=noreply@tudominio.com
+   MAIL_FROM_ADDRESS=noreply@yourdomain.com
    ```
 
-### Opción 2: Mailtrap (Para Testing)
+### Option 2: Mailtrap (For Testing)
 
-1. Crea cuenta en [Mailtrap.io](https://mailtrap.io)
-2. Usa las credenciales SMTP que te dan
+1. Create account at [Mailtrap.io](https://mailtrap.io)
+2. Use the SMTP credentials they provide
 
-## 🔐 Seguridad en Producción
+## 🔐 Production Security
 
-- ✅ `APP_DEBUG=false` en producción
+- ✅ `APP_DEBUG=false` in production
 - ✅ `APP_ENV=production`
-- ✅ Usa HTTPS (Render lo proporciona automáticamente)
-- ✅ Variables sensibles en Environment Variables (nunca en código)
-- ✅ Rate limiting configurado en rutas de autenticación
+- ✅ Use HTTPS (Render provides it automatically)
+- ✅ Sensitive variables in Environment Variables (never in code)
+- ✅ Rate limiting configured on authentication routes
 
-## 📱 Dominio Personalizado (Opcional)
+## 📱 Custom Domain (Optional)
 
-1. Ve a tu Web Service → Settings → Custom Domains
+1. Go to your Web Service → Settings → Custom Domains
 2. Click "Add Custom Domain"
-3. Ingresa tu dominio (ej: `forum.tudominio.com`)
-4. Sigue las instrucciones para configurar DNS
-5. Render proporciona SSL/HTTPS gratis con Let's Encrypt
+3. Enter your domain (e.g., `forum.yourdomain.com`)
+4. Follow instructions to configure DNS
+5. Render provides free SSL/HTTPS with Let's Encrypt
 
-## 🔄 Actualizar la Aplicación
+## 🔄 Update the Application
 
-Simplemente haz push a la rama `main`:
+Simply push to the `main` branch:
 
 ```bash
 git add .
@@ -254,11 +254,10 @@ git commit -m "Update feature"
 git push origin main
 ```
 
-Render detectará el cambio y hará deploy automáticamente.
+Render will detect the change and deploy automatically.
 
-## 📞 Soporte
+## 📞 Support
 
-- [Documentación Render](https://render.com/docs)
+- [Render Documentation](https://render.com/docs)
 - [Render Community](https://community.render.com)
 - [Laravel Deployment Docs](https://laravel.com/docs/deployment)
-

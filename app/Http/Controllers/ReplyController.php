@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Badge;
 use App\Models\Discussion;
+use App\Models\Image;
 use App\Models\Reply;
 use App\Notifications\BestAnswerNotification;
 use App\Notifications\NewReplyNotification;
+use App\Services\ImageService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
@@ -17,16 +19,31 @@ class ReplyController extends Controller
     /**
      * Store a new reply to a discussion.
      */
-    public function store(Request $request, Discussion $discussion)
+    public function store(Request $request, Discussion $discussion, ImageService $imageService)
     {
         $validated = $request->validate([
             'content' => 'required|string|min:5',
+            'images.*' => 'nullable|image|max:5120', // 5MB max per image
         ]);
 
         $reply = $discussion->replies()->create([
             'user_id' => auth()->id(),
             'content' => $validated['content'],
         ]);
+
+        // Handle image uploads
+        if ($request->hasFile('images')) {
+            $disk = config('filesystems.images');
+            foreach ($request->file('images') as $image) {
+                $imageService->setDisk($disk)->uploadAndOptimize(
+                    $image,
+                    $reply,
+                    null, // alt_text
+                    1200, // max width
+                    85    // quality
+                );
+            }
+        }
 
         // Award points for posting a reply
         auth()->user()->increment('points', 3);
@@ -57,15 +74,43 @@ class ReplyController extends Controller
     /**
      * Update the specified reply.
      */
-    public function update(Request $request, Reply $reply)
+    public function update(Request $request, Reply $reply, ImageService $imageService)
     {
         $this->authorize('update', $reply);
 
         $validated = $request->validate([
             'content' => 'required|string|min:5',
+            'images.*' => 'nullable|image|max:5120', // 5MB max per image
+            'removed_images' => 'nullable|array',
+            'removed_images.*' => 'exists:images,id',
         ]);
 
-        $reply->update($validated);
+        $reply->update([
+            'content' => $validated['content'],
+        ]);
+
+        // Handle image removals
+        if ($request->has('removed_images')) {
+            Image::whereIn('id', $request->removed_images)
+                ->where('imageable_type', Reply::class)
+                ->where('imageable_id', $reply->id)
+                ->get()
+                ->each(fn ($image) => $image->delete());
+        }
+
+        // Handle new image uploads
+        if ($request->hasFile('images')) {
+            $disk = config('filesystems.images');
+            foreach ($request->file('images') as $image) {
+                $imageService->setDisk($disk)->uploadAndOptimize(
+                    $image,
+                    $reply,
+                    null, // alt_text
+                    1200, // max width
+                    85    // quality
+                );
+            }
+        }
 
         return redirect()
             ->route('discussions.show', $reply->discussion)

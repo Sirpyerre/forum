@@ -59,7 +59,7 @@ class ForumController extends Controller
         $discussion->increment('views');
 
         // Load discussion with relationships
-        $discussion->load(['user.badges', 'channel', 'replies.user.badges', 'replies.likes']);
+        $discussion->load(['user.badges', 'channel', 'images', 'replies.user.badges', 'replies.likes', 'replies.images']);
 
         // Check if current user is watching this discussion
         $isWatching = auth()->check()

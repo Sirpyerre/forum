@@ -20,7 +20,7 @@ Route::get('/debug-info', function () {
         'laravel_version' => app()->version(),
         'app_env' => config('app.env'),
         'app_debug' => config('app.debug'),
-        'app_key_set' => !empty(config('app.key')),
+        'app_key_set' => ! empty(config('app.key')),
         'db_connection' => config('database.default'),
         'db_host' => config('database.connections.pgsql.host'),
         'db_database' => config('database.connections.pgsql.database'),

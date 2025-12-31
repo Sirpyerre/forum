@@ -40,8 +40,10 @@ RUN chmod +x render-build.sh
 # Expose port
 EXPOSE 8080
 
-# Run build script
+# Run build script (but skip config:cache)
 RUN ./render-build.sh
 
-# Start PHP built-in server
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+# Start PHP built-in server with config clear and cache
+CMD php artisan config:clear && \
+    php artisan config:cache && \
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}

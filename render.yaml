@@ -10,9 +10,9 @@ services:
       - key: APP_NAME
         value: Convene
       - key: APP_ENV
-        value: production
+        value: local
       - key: APP_DEBUG
-        value: false
+        value: true
       - key: APP_URL
         sync: false  # Set manually in Render Dashboard
       - key: APP_KEY

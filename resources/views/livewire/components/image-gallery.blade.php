@@ -6,51 +6,42 @@ use App\Models\Image;
 new class extends Component {
     public $images = [];
     public $columns = 4; // Grid columns: 2, 3, 4, 5
-    public $showLightbox = false;
-    public $currentIndex = 0;
 
     public function mount($images = [], $columns = 4)
     {
         $this->images = $images;
         $this->columns = $columns;
     }
-
-    public function openLightbox($index)
-    {
-        $this->currentIndex = $index;
-        $this->showLightbox = true;
-    }
-
-    public function closeLightbox()
-    {
-        $this->showLightbox = false;
-    }
-
-    public function next()
-    {
-        $this->currentIndex = ($this->currentIndex + 1) % count($this->images);
-    }
-
-    public function previous()
-    {
-        $this->currentIndex = ($this->currentIndex - 1 + count($this->images)) % count($this->images);
-    }
 }; ?>
 
 <div
     x-data="{
-        showLightbox: @entangle('showLightbox'),
-        currentIndex: @entangle('currentIndex')
+        showLightbox: false,
+        currentIndex: 0,
+        totalImages: {{ count($images) }},
+        openLightbox(index) {
+            this.currentIndex = index;
+            this.showLightbox = true;
+        },
+        closeLightbox() {
+            this.showLightbox = false;
+        },
+        next() {
+            this.currentIndex = (this.currentIndex + 1) % this.totalImages;
+        },
+        previous() {
+            this.currentIndex = (this.currentIndex - 1 + this.totalImages) % this.totalImages;
+        }
     }"
-    @keydown.escape.window="showLightbox = false"
-    @keydown.arrow-right.window="showLightbox && $wire.next()"
-    @keydown.arrow-left.window="showLightbox && $wire.previous()"
+    @keydown.escape.window="closeLightbox()"
+    @keydown.arrow-right.window="showLightbox && next()"
+    @keydown.arrow-left.window="showLightbox && previous()"
 >
     @if(count($images) > 0)
         <!-- Gallery Grid -->
         <div class="grid gap-4 @if($columns === 2) grid-cols-2 @elseif($columns === 3) grid-cols-2 md:grid-cols-3 @elseif($columns === 5) grid-cols-2 md:grid-cols-3 lg:grid-cols-5 @else grid-cols-2 md:grid-cols-3 lg:grid-cols-4 @endif">
             @foreach($images as $index => $image)
-                <div class="relative group cursor-pointer" wire:click="openLightbox({{ $index }})">
+                <div class="relative group cursor-pointer" @click="openLightbox({{ $index }})">
                     <div class="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 transition-transform group-hover:scale-105">
                         <img
                             src="{{ $image->url() }}"
@@ -80,11 +71,11 @@ new class extends Component {
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
-            @click="showLightbox = false"
+            @click="closeLightbox()"
         >
             <!-- Close Button -->
             <button
-                @click.stop="showLightbox = false"
+                @click.stop="closeLightbox()"
                 class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
             >
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +86,7 @@ new class extends Component {
             <!-- Previous Button -->
             @if(count($images) > 1)
                 <button
-                    @click.stop="$wire.previous()"
+                    @click.stop="previous()"
                     class="absolute left-4 text-white hover:text-gray-300 transition-colors z-10"
                 >
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +124,7 @@ new class extends Component {
             <!-- Next Button -->
             @if(count($images) > 1)
                 <button
-                    @click.stop="$wire.next()"
+                    @click.stop="next()"
                     class="absolute right-4 text-white hover:text-gray-300 transition-colors z-10"
                 >
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +136,7 @@ new class extends Component {
             <!-- Counter (mobile) -->
             @if(count($images) > 1)
                 <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black/50 px-3 py-1 rounded-full">
-                    {{ $currentIndex + 1 }} / {{ count($images) }}
+                    <span x-text="currentIndex + 1"></span> / {{ count($images) }}
                 </div>
             @endif
         </div>

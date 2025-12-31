@@ -1,7 +1,7 @@
 services:
-  # Web Service (Laravel Forum App)
+  # Web Service (Convene App)
   - type: web
-    name: laravel-forum
+    name: convene
     runtime: docker
     plan: free
     region: oregon
@@ -10,7 +10,7 @@ services:
     startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
     envVars:
       - key: APP_NAME
-        value: Laravel Forum
+        value: Convene
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -29,23 +29,23 @@ services:
         value: pgsql
       - key: DB_HOST
         fromDatabase:
-          name: laravel-forum-db
+          name: convene-db
           property: host
       - key: DB_PORT
         fromDatabase:
-          name: laravel-forum-db
+          name: convene-db
           property: port
       - key: DB_DATABASE
         fromDatabase:
-          name: laravel-forum-db
+          name: convene-db
           property: database
       - key: DB_USERNAME
         fromDatabase:
-          name: laravel-forum-db
+          name: convene-db
           property: user
       - key: DB_PASSWORD
         fromDatabase:
-          name: laravel-forum-db
+          name: convene-db
           property: password
 
       # Cache & Sessions
@@ -102,7 +102,7 @@ services:
 
 databases:
   # PostgreSQL Database (Free tier: 1GB storage, expires in 90 days)
-  - name: laravel-forum-db
-    databaseName: laravel_forum
+  - name: convene-db
+    databaseName: convene
     plan: free
     region: oregon

@@ -1,4 +1,4 @@
-# 🗣️ Laravel Forum
+# 🗣️ Convene
 
 A modern, feature-rich discussion forum built with Laravel 12, Livewire 3, and Tailwind CSS 4. A StackOverflow-style platform for creating discussions, posting replies, and building a knowledge-sharing community.
 
@@ -129,8 +129,8 @@ A modern, feature-rich discussion forum built with Laravel 12, Livewire 3, and T
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/laravel-forum.git
-cd laravel-forum
+git clone https://github.com/yourusername/convene.git
+cd convene
 ```
 
 ### 2. Install Dependencies
@@ -156,7 +156,7 @@ php artisan key:generate
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=laravel_forum
+DB_DATABASE=convene
 DB_USERNAME=root
 DB_PASSWORD=
 ```
@@ -275,7 +275,7 @@ IMAGES_DISK=s3
 AWS_ACCESS_KEY_ID=your_key
 AWS_SECRET_ACCESS_KEY=your_secret
 AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=your_bucket_name
+AWS_BUCKET=convene-images
 ```
 
 For detailed image upload documentation, see [docs/IMAGE_UPLOAD.md](docs/IMAGE_UPLOAD.md).
@@ -343,7 +343,7 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 ## 📧 Support
 
-For support, please open an issue on [GitHub Issues](https://github.com/yourusername/laravel-forum/issues).
+For support, please open an issue on [GitHub Issues](https://github.com/yourusername/convene/issues).
 
 ## 🗺️ Roadmap
 

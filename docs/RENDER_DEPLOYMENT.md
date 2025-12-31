@@ -1,6 +1,6 @@
 # Guía de Deployment en Render
 
-Esta guía te ayudará a desplegar tu aplicación Laravel Forum en Render.
+Esta guía te ayudará a desplegar tu aplicación Convene en Render.
 
 ## Tabla de Contenidos
 
@@ -45,9 +45,9 @@ git push origin main
 1. Ve a [Render Dashboard](https://dashboard.render.com/)
 2. Click en **"New +"** → **"PostgreSQL"**
 3. Configuración:
-   - **Name:** `laravel-forum-db`
-   - **Database:** `laravel_forum`
-   - **User:** `laravel_forum_user`
+   - **Name:** `convene-db`
+   - **Database:** `convene`
+   - **User:** `convene_user`
    - **Region:** Selecciona la más cercana a tus usuarios
    - **Plan:** Free (para pruebas) o Starter ($7/mes)
 4. Click **"Create Database"**
@@ -68,7 +68,7 @@ git push origin main
 1. Click **"New +"** → **"Web Service"**
 2. Conecta tu repositorio Git
 3. Configuración:
-   - **Name:** `laravel-forum`
+   - **Name:** `convene`
    - **Region:** Misma que la base de datos
    - **Branch:** `main`
    - **Runtime:** `Docker`
@@ -83,17 +83,17 @@ En tu Web Service, ve a **Environment** y agrega:
 
 ```bash
 # Application
-APP_NAME="Laravel Forum"
+APP_NAME="Convene"
 APP_ENV=production
 APP_KEY=                          # Se generará automáticamente
 APP_DEBUG=false
-APP_URL=https://tu-app.onrender.com
+APP_URL=https://convene.onrender.com
 
 # Database (obtenido del servicio PostgreSQL de Render)
 DB_CONNECTION=pgsql
 DB_HOST=                          # Desde Internal Database URL
 DB_PORT=5432
-DB_DATABASE=laravel_forum
+DB_DATABASE=convene
 DB_USERNAME=                      # Desde credenciales de DB
 DB_PASSWORD=                      # Desde credenciales de DB
 
@@ -118,7 +118,7 @@ MAIL_PORT=2525
 MAIL_USERNAME=                    # Tu username de Mailtrap
 MAIL_PASSWORD=                    # Tu password de Mailtrap
 MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=noreply@laravel-forum.com
+MAIL_FROM_ADDRESS=noreply@convene.com
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
@@ -169,7 +169,7 @@ IMAGES_DISK=s3
 AWS_ACCESS_KEY_ID=                # Tu access key
 AWS_SECRET_ACCESS_KEY=            # Tu secret key
 AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=laravel-forum-images
+AWS_BUCKET=convene-images
 AWS_USE_PATH_STYLE_ENDPOINT=false
 ```
 
@@ -244,7 +244,7 @@ Si quieres procesar jobs en cola:
 
 1. En Render Dashboard, click **"New +"** → **"Background Worker"**
 2. Configuración:
-   - **Name:** `laravel-forum-worker`
+   - **Name:** `convene-worker`
    - **Runtime:** `Docker`
    - **Start Command:** `php artisan queue:work --verbose --tries=3 --timeout=90`
 3. Usa las **mismas variables de entorno** que el Web Service
@@ -272,8 +272,8 @@ APP_KEY=base64:...
    ```
    DB_HOST=dpg-xxxxx-a
    DB_PORT=5432
-   DB_DATABASE=laravel_forum
-   DB_USERNAME=laravel_forum_user
+   DB_DATABASE=convene
+   DB_USERNAME=convene_user
    DB_PASSWORD=xxxxx
    ```
 
@@ -404,4 +404,4 @@ Si tienes problemas:
 
 ---
 
-**¡Felicidades! Tu aplicación Laravel Forum está en producción!** 🎉
+**¡Felicidades! Tu aplicación Convene está en producción!** 🎉

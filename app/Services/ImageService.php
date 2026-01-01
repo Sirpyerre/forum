@@ -154,14 +154,24 @@ class ImageService
 
     /**
      * Get storage path based on model type.
+     * Structure: convene/{user_id}/{discussion_id}/{date_without_spaces}
      */
     private function getStoragePath(Model $model): string
     {
-        $modelName = class_basename($model);
-        $year = now()->format('Y');
-        $month = now()->format('m');
+        // Get user_id from the model
+        $userId = $model->user_id ?? auth()->id() ?? 'guest';
 
-        return strtolower($modelName)."s/{$year}/{$month}";
+        // Get discussion_id - if model is Discussion, use its id, if Reply, use discussion_id
+        $discussionId = match (get_class($model)) {
+            \App\Models\Discussion::class => $model->id ?? 'temp',
+            \App\Models\Reply::class => $model->discussion_id ?? $model->discussion?->id ?? 'temp',
+            default => 'other',
+        };
+
+        // Date without spaces: YYYYMMDD_HHmmss
+        $date = now()->format('Ymd_His');
+
+        return "convene/{$userId}/{$discussionId}/{$date}";
     }
 
     /**

@@ -307,17 +307,11 @@ Image CDN with transformation capabilities.
 
 **Setup:**
 
-1. Install Cloudinary SDK:
-   ```bash
-   composer require cloudinary-labs/cloudinary-laravel
-   ```
+Cloudinary is already installed and configured! Just add your credentials:
 
-2. Publish config:
-   ```bash
-   php artisan vendor:publish --provider="CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider"
-   ```
+1. Get your credentials from [Cloudinary Dashboard](https://cloudinary.com/console)
 
-3. Configure `.env`:
+2. Configure `.env`:
    ```env
    IMAGES_DISK=cloudinary
    CLOUDINARY_CLOUD_NAME=your_cloud_name
@@ -325,16 +319,29 @@ Image CDN with transformation capabilities.
    CLOUDINARY_API_SECRET=your_api_secret
    ```
 
+3. Images will be stored in organized folders:
+   ```
+   convene/{user_id}/{discussion_id}/{timestamp}/image.jpg
+   ```
+
+   Example: `convene/1/5/20251231_143022/screenshot-a1b2c3d4.jpg`
+
 **Pros:**
 - Built-in image transformations
 - Automatic optimization
 - CDN included
 - Free tier (25GB/month)
+- Organized folder structure
+- Already integrated with custom driver
 
 **Cons:**
 - Requires Cloudinary account
 - Vendor lock-in
 - Costs beyond free tier
+
+**Technical Details:**
+
+The application uses a custom `CloudinaryServiceProvider` that extends Laravel's filesystem to support Cloudinary as a first-class driver. Images are organized by user and discussion for easy management in the Cloudinary dashboard.
 
 ### Switching Drivers
 

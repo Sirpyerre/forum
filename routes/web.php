@@ -49,6 +49,55 @@ Route::get('/run-migrations', function () {
     }
 });
 
+// Test image upload route - REMOVE AFTER TESTING
+Route::get('/test-image-upload', function () {
+    return view('test-image-upload');
+});
+
+Route::post('/test-image-upload', function () {
+    $validated = request()->validate([
+        'image' => 'required|image|max:5120',
+        'user_id' => 'required|integer',
+        'discussion_id' => 'required|integer',
+    ]);
+
+    $imageService = app(\App\Services\ImageService::class);
+
+    // Create a mock discussion to test
+    $discussion = new \App\Models\Discussion;
+    $discussion->id = request('discussion_id');
+    $discussion->user_id = request('user_id');
+    $discussion->exists = false; // Don't save to DB
+
+    try {
+        // Get the storage path without uploading
+        $reflection = new ReflectionClass($imageService);
+        $method = $reflection->getMethod('getStoragePath');
+        $method->setAccessible(true);
+        $path = $method->invoke($imageService, $discussion);
+
+        // Get filename
+        $filenameMethod = $reflection->getMethod('generateFilename');
+        $filenameMethod->setAccessible(true);
+        $filename = $filenameMethod->invoke($imageService, request()->file('image'));
+
+        return response()->json([
+            'status' => 'success',
+            'storage_path' => $path,
+            'filename' => $filename,
+            'full_path' => $path.'/'.$filename,
+            'disk' => config('filesystems.images', 'public'),
+            'expected_url' => asset('storage/'.$path.'/'.$filename),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+});
+
 // Seed route - REMOVE AFTER FIXING
 Route::get('/run-seeders', function () {
     try {

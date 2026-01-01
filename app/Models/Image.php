@@ -47,6 +47,17 @@ class Image extends Model
      */
     public function url(): string
     {
+        // If path is already a full URL (for seeded data), return it directly
+        if (filter_var($this->path, FILTER_VALIDATE_URL)) {
+            return $this->path;
+        }
+
+        // For Cloudinary, use the cloudinary URL helper
+        if ($this->disk === 'cloudinary') {
+            return cloudinary()->getUrl($this->path);
+        }
+
+        // For other disks (local, s3, etc.)
         return Storage::disk($this->disk)->url($this->path);
     }
 
@@ -55,11 +66,21 @@ class Image extends Model
      */
     public function temporaryUrl(int $minutes = 60): string
     {
+        // If path is already a full URL, return it directly
+        if (filter_var($this->path, FILTER_VALIDATE_URL)) {
+            return $this->path;
+        }
+
         if ($this->disk === 's3') {
             return Storage::disk($this->disk)->temporaryUrl(
                 $this->path,
                 now()->addMinutes($minutes)
             );
+        }
+
+        // Cloudinary URLs are always accessible (no temporary URL needed)
+        if ($this->disk === 'cloudinary') {
+            return $this->url();
         }
 
         return $this->url();
@@ -70,6 +91,11 @@ class Image extends Model
      */
     public function deleteFile(): bool
     {
+        // Don't try to delete external URLs (seeded data)
+        if (filter_var($this->path, FILTER_VALIDATE_URL)) {
+            return true;
+        }
+
         return Storage::disk($this->disk)->delete($this->path);
     }
 
